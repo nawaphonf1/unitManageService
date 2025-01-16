@@ -70,7 +70,7 @@ def get_unit(db: Session, unit_id: int):
     return None
 
 
-def get_all_units(db: Session, name=None, position_id=None, dept_id=None, skip=0, limit=100):
+def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=None, skip=0, limit=100):
     # Base query with join
     query = (
         db.query(
@@ -87,11 +87,13 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None, skip=0
 
     # Apply filters
     if name:
-        query = query.filter(Unit.first_name.contains(name))
+        query = query.filter(Unit.first_name.contains(name) | Unit.last_name.contains(name))
     if position_id:
         query = query.filter(Unit.position_id == position_id)
     if dept_id:
         query = query.filter(Unit.dept_id == dept_id)
+    if status:
+        query = query.filter(Unit.status == status)
 
     # Get total count for pagination
     total = query.with_entities(func.count()).scalar()

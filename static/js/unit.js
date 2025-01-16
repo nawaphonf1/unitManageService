@@ -25,9 +25,30 @@ let currentPage = 1;
 const rowsPerPage = 10;
 
 // Function to fetch and display units
-async function fetchAndDisplayUnits(page = 1) {
+async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status = '',name = '') {
     try {
-        const response = await fetch(`${apiUrl}?skip=${(page - 1) * rowsPerPage}&limit=${rowsPerPage}`, {
+        // สร้าง query string เฉพาะพารามิเตอร์ที่มีค่า
+        const queryParams = new URLSearchParams();
+        queryParams.append("skip", (page - 1) * rowsPerPage);
+        queryParams.append("limit", rowsPerPage);
+
+        console.log(name);
+
+        if (position) {
+            queryParams.append("position_id", position);
+        }
+        if (dept) {
+            queryParams.append("dept_id", dept);
+        }
+        if (status) {
+            queryParams.append("status", status);
+        }
+        if (name) {
+            queryParams.append("name", name);
+        }
+
+        // ส่งคำขอไปที่ API พร้อม query string
+        const response = await fetch(`${apiUrl}?${queryParams.toString()}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -55,7 +76,6 @@ async function fetchAndDisplayUnits(page = 1) {
         data.units.forEach((unit, index) => {
             const statusColor = unit.status === "ready" ? "green" : "red";
             const row = document.createElement("tr");
-            console.log(unit);
             row.innerHTML = `
                 <td>${(page - 1) * rowsPerPage + index + 1}</td>
                 <td>${unit.position_name || "N/A"}</td>
@@ -68,7 +88,6 @@ async function fetchAndDisplayUnits(page = 1) {
                     <button class="btn btn-info btn-sm" data-id="${unit.units_id}" onclick="showMemberDetail(${unit.units_id})">รายละเอียด</button>
                     <button class="btn btn-warning btn-sm" data-id="${unit.units_id}" onclick="showMemberEdit(${unit.units_id})">แก้ไข</button>
                 </td>
-
             `;
             tableBody.appendChild(row);
         });
@@ -80,6 +99,7 @@ async function fetchAndDisplayUnits(page = 1) {
         console.error("Error fetching units:", error);
     }
 }
+
 
 async function displayUnitsMission(unitId) {
     try {
@@ -558,6 +578,117 @@ document.getElementById("save-add-units").addEventListener("click", async () => 
             window.location.reload();
         }
 
+    } catch (error) {
+        console.error("Error fetching member details:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
+    }
+});
+
+document.getElementById("filter-units").addEventListener("click", async () => {
+    try {
+
+        // โหลดข้อมูลตำแหน่งจาก API
+        const positionResponse = await fetch(`http://127.0.0.1:8000/api/position`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!positionResponse.ok) {
+            throw new Error("Failed to fetch positions.");
+        }
+
+        const positions = await positionResponse.json();
+
+        const positionDropdown = document.getElementById("filterPosition");
+
+        // เก็บค่าที่เลือกไว้ก่อนหน้านี้ (ถ้ามี)
+        const previousValue = positionDropdown.value;
+
+        positionDropdown.innerHTML = ""; // ลบตัวเลือกเก่า
+        const option2 = document.createElement("option");
+        option2.value = '';
+        option2.textContent = '';
+
+        positionDropdown.appendChild(option2);
+        positions.forEach(position => {  
+            const option2 = document.createElement("option");
+            option2.value = position.position_id;
+            option2.textContent = position.position_name;
+
+            // ตั้งค่า selected หากตรงกับค่าที่เลือกไว้ก่อนหน้า
+            if (position.position_id.toString() === previousValue) {
+                option2.selected = true;
+            }
+
+            positionDropdown.appendChild(option2);
+        });
+
+
+        // โหลดข้อมูลสังกัดจาก API
+        const deptResponse = await fetch(`http://127.0.0.1:8000/api/dept/`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!deptResponse.ok) {
+            throw new Error("Failed to fetch departments.");
+        }
+
+        const departments = await deptResponse.json();
+
+        // กำหนดตัวเลือกใน dropdown "สังกัด"
+        const deptDropdown = document.getElementById("filterDept");
+
+        // เก็บค่าที่เลือกไว้ก่อนหน้านี้ (ถ้ามี)
+        const previousdeptDropdownValue = deptDropdown.value;
+
+        deptDropdown.innerHTML = ""; // ลบตัวเลือกเก่า
+        let o3 = 0; 
+
+        const option = document.createElement("option");
+        option.value = '';
+        option.textContent = '';
+        deptDropdown.appendChild(option);
+
+        departments.forEach(dept => {
+            const option = document.createElement("option");
+            option.value = dept.dept_id;
+            option.textContent = dept.dept_name;
+
+            // ตั้งค่า selected หากตรงกับค่าที่เลือกไว้ก่อนหน้า
+            if (dept.dept_id.toString() === previousdeptDropdownValue) {
+                option.selected = true;
+            }
+            deptDropdown.appendChild(option);
+
+        });
+
+    } catch (error) {
+        console.error("Error fetching member details:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
+    }
+});
+
+document.getElementById("submit-filter-units").addEventListener("click", async () => {
+    try {
+        const filterPosition = document.getElementById("filterPosition").value;
+        const filterDept = document.getElementById("filterDept").value;
+        const filterStatus = document.getElementById("filterStatus").value;
+        const filterName = document.getElementById("filterName").value;
+
+
+        // เรียก fetchAndDisplayUnits พร้อมค่าฟิลเตอร์
+        await fetchAndDisplayUnits(1, filterPosition, filterDept, filterStatus, filterName);
+
+        // ดึง instance ของ modal ที่เปิดอยู่
+        const filterModal = bootstrap.Modal.getInstance(document.getElementById("filterModal"));
+        filterModal.hide(); // ใช้ hide() เพื่อปิด modal
     } catch (error) {
         console.error("Error fetching member details:", error);
         alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
