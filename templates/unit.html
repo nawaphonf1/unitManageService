@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="/static/css/index.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-1 bg-dark text-white vh-100 text-center h-100 position-fixed">
+            <div class="mb-3 mt-3">
+                <img src="/static/img/logo.png" alt="Logo" class="rounded mx-auto d-block" style="max-width: 70px;">
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item py-2 hover-sidebar">
+                    <a class="nav-link text-white" href="http://127.0.0.1:8000/index">
+                        <img src="/static/img/dashboard.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        สรุปยอด
+                    </a>
+                </li>
+                <li class="nav-item py-2 hover-sidebar">
+                    <a class="nav-link text-white" href="/product_list">
+                        <img src="/static/img/package.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        จัดการภารกิจ
+                    </a>
+                </li>
+                <li class="nav-item py-2 hover-sidebar">
+
+                    <a class="nav-link text-white" href="/unit">
+                        <img src="/static/img/multiple-users-silhouette.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        จัดการกำลังพล
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-11 p-4 ms-auto">
+            <h5 class="text-center pb-4">รายชื่อกำลังพล</h5>
+
+            <table class="table table-bordered table-striped">
+                <thead class="table-primery text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>ยศ</th>
+                        <th>ชื่อ</th>
+                        <th>สังกัด</th>
+                        <th>สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody id="unitTableBody" class="text-center">
+                    <!-- Rows will be dynamically inserted here -->
+                </tbody>
+            </table>
+
+            <nav>
+                <ul class="pagination justify-content-center" id="pagination">
+                </ul>
+            </nav>
+        </div>
+
+        <!-- detail -->
+        <div class="modal fade" id="unitDetailModal" tabindex="-1" aria-labelledby="unitDetailModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="unitDetailModalLabel">รายละเอียดสมาชิก</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <!-- <div class="input-group mb-3">
+                                        <input type="file" class="form-control" id="units-image">
+                                        <label class="input-group-text" id="upload-image-btn">อัพโหลดรูป</label>
+                                    </div> -->
+
+
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <img id="units-img" src="" class="rounded mx-auto d-block mb-3" alt="units Image" style="max-width: 300px; max-height: 300px;">
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="row">
+                                                <p id="unitDetailName" class="form-label">ชื่อ</p>
+                                                <hr>
+                                                <p id="deptDetailName" class="form-label">สังกัด</p>
+                                                <hr>
+                                                <p id="identifyIdDetail" class="form-label">หมายเลขประจำตัว</p>
+                                                <hr>
+
+                                                <p id="identifySoldierIdDetail" class="form-label">หมายเลขประจำตัว</p>
+                                                <hr>
+
+                                                <p id="telDetail" class="form-label">เบอร์โทร</p>
+                                                <hr>
+
+                                                <p id="bloodGroupDetail" class="form-label">กรุ๊ปเลือด</p>
+                                                <hr>
+
+                                                <p id="addressDetail" class="form-label">ที่อยู่</p>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="col-12">
+                                            <h5>ประวัติการทำภารกิจ</h5>
+                                            <table class="table text-center">
+                                                <thead>
+                                                  <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">ชื่อภารกิจ</th>
+                                                    <th scope="col">วันที่เริ่ม</th>
+                                                    <th scope="col">วันที่สิ้นสุด</th>
+                                                    <th scope="col">สถานะ</th>
+                                                  </tr>
+                                                </thead>
+                                                <tbody id = "missionTableBody">
+                                                  <!-- Rows will be dynamically inserted here -->
+                                                
+                                                </tbody>
+                                              </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="static/js/unit.js"></script>
+</body>
+
+</html>

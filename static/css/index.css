@@ -1,0 +1,103 @@
+.hover-sidebar:hover {
+    background-color: brown;
+}
+
+#order-list {
+    max-height: 1000px;      /* กำหนดความสูงสูงสุด */
+    overflow-y: auto;        /* ทำให้สามารถเลื่อนลงได้เมื่อเกินขนาด */
+    padding-right: 15px;      /* เพิ่มช่องว่างด้านขวาเล็กน้อย เพื่อให้มีสกรอลล์ */
+}
+
+.card {
+    height: 100%; /* ให้การ์ดขยายเต็มความสูงที่กำหนด */
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body {
+    flex-grow: 1; /* กระจายเนื้อหาใน card-body ให้สมดุล */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* จัดเนื้อหาให้แยกกันระหว่างส่วนหัว/ส่วนท้าย */
+}
+
+.card img {
+    max-height: 100px; /* จำกัดความสูงของรูปภาพ */
+    object-fit: cover; /* ปรับรูปให้ครอบคลุมพื้นที่ */
+}
+
+.max-img-dashboad{
+    height: 50px;
+    width: 50px;
+}
+
+
+.card-custom {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.card-custom img {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    opacity: 0.2; /* ทำให้ภาพโปร่งใส */
+    width: 100px;
+    height: auto;
+}
+
+.card-custom h4, 
+.card-custom p, 
+.card-custom small {
+    position: relative;
+    z-index: 2; /* ให้ข้อความอยู่ด้านหน้า */
+    text-align: left; /* จัดข้อความชิดซ้าย */
+}
+
+.bg-dashboad-1{
+    background-color: #3F7BFD;
+}
+
+.bg-dashboad-2{
+    background-color: #0FB755;
+}
+
+.bg-dashboad-3{
+    background-color: #EC469C;
+}
+
+.sidebar {
+    position: fixed; /* ทำให้ Sidebar คงที่ */
+    top: 0;
+    left: 0;
+    height: 100vh; /* ความสูงเต็มจอ */
+    width: 80px; /* กำหนดความกว้าง */
+    background-color: #343a40; /* สีพื้นหลัง */
+    color: white; /* สีข้อความ */
+    overflow: hidden; /* ป้องกันเนื้อหาเกินออกมา */
+    transition: width 0.3s ease; /* เพิ่มเอฟเฟกต์ขยาย */
+    z-index: 1000; /* ทำให้ Sidebar อยู่ด้านหน้า */
+}
+
+.row-detail {
+    display: flex; /* ใช้ Flexbox สำหรับจัดตำแหน่ง */
+    justify-content: space-between; /* จัดข้อความให้อยู่ฝั่งซ้ายและขวาสุด */
+    margin-bottom: 10px; /* เพิ่มระยะห่างระหว่างบรรทัด */
+}
+.row-detail strong {
+    flex: 1; /* ขยายพื้นที่สำหรับข้อความด้านซ้าย */
+    text-align: left; /* จัดข้อความชิดซ้าย */
+}
+.row-detail span {
+    flex: 1; /* ขยายพื้นที่สำหรับข้อความด้านขวา */
+    text-align: right; /* จัดข้อความชิดขวา */
+}
+
+.status-circle {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
