@@ -509,3 +509,57 @@ document.getElementById("unitAddModal").addEventListener("click", async () => {
         alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
     }
 });
+
+
+document.getElementById("save-add-units").addEventListener("click", async () => {
+    try {
+        const unitAddPosition = document.getElementById("unitAddPosition").value;
+        const unitAddFirstName = document.getElementById("unitAddFirstName").value;
+        const unitAddLastName = document.getElementById("unitAddLastName").value;
+        const identifyIdAdd = document.getElementById("identifyIdAdd").value;
+        const deptAddName = document.getElementById("deptAddName").value;
+
+        const identifySoldierIdAdd = document.getElementById("identifySoldierIdAdd").value;
+        const telAdd = document.getElementById("telAdd").value;
+        const bloodGroupAdd = document.getElementById("bloodGroupAdd").value;
+        const addressAdd = document.getElementById("addressAdd").value;
+
+        const unitsImg = document.getElementById("units-img-edit");
+        const imgPath = unitsImg.src && unitsImg.style.display !== "none" ? unitsImg.src : null;
+
+        const payload = {
+            img_path: imgPath,
+            position_id: unitAddPosition,
+            first_name: unitAddFirstName,
+            last_name: unitAddLastName,
+            dept_id: deptAddName,
+            identify_id: identifyIdAdd,
+            identify_soldier_id: identifySoldierIdAdd,
+            tel: telAdd,
+            boold_group_id: bloodGroupAdd,
+            address_detail: addressAdd
+        };
+
+        // โหลดข้อมูลตำแหน่งจาก API
+        const positionResponse = await fetch(`http://127.0.0.1:8000/api/unit`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!positionResponse.ok) {
+            throw new Error("Failed to fetch positions.");
+        }
+
+        if (positionResponse.ok) {
+            window.location.reload();
+        }
+
+    } catch (error) {
+        console.error("Error fetching member details:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
+    }
+});

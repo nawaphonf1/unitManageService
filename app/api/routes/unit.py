@@ -26,7 +26,7 @@ async def upload_image(file: UploadFile = File(...)):
 
     return {"imageUrl": f"/uploads/{file.filename}"}
 
-@router.post("/units/", response_model=UnitOut)
+@router.post("/", response_model=UnitOut)
 def create_unit(unit: UnitCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     # current_user จะได้รับค่าผู้ใช้จากการตรวจสอบ token
     return unit_service.create_unit(db=db, unit=unit)

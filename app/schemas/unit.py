@@ -29,8 +29,8 @@ class UnitCreate(UnitBase):
 # Schema สำหรับการตอบกลับข้อมูล Unit
 class UnitOut(UnitBase):
     units_id: int
-    dept_name: str
-    position_name: str
+    dept_name: Optional[str] = None
+    position_name: Optional[str] = None
 
 class UnitUpdate(BaseModel):
     first_name: str
