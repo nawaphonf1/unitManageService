@@ -5,7 +5,7 @@ from app.models.unit import Unit
 from app.models.position import Position
 from app.models.dept import Dept
 
-from app.schemas.unit import UnitCreate, UnitAll
+from app.schemas.unit import UnitCreate, UnitAll, UnitResponse, UnitUpdate
 
 def create_unit(db: Session, unit: UnitCreate):
     db_unit = Unit(**unit.dict())
@@ -13,6 +13,11 @@ def create_unit(db: Session, unit: UnitCreate):
     db.commit()
     db.refresh(db_unit)
     return db_unit
+
+def update_unit(db: Session, unit_id: int, unit: UnitUpdate):
+    db.query(Unit).filter(Unit.units_id == unit_id).update(unit.dict())
+    db.commit()
+    return db.query(Unit).filter(Unit.units_id == unit_id).first()
 
 def get_unit(db: Session, unit_id: int):
     query = db.query(

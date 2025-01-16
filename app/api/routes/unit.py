@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from ...database import SessionLocal
 from ...services import unit_service
 from ...models.unit import Unit
-from ...schemas.unit import UnitCreate, UnitOut, UnitAll, UnitResponse
+from ...schemas.unit import UnitCreate, UnitOut, UnitAll, UnitResponse, UnitUpdate, UnitBase
 from app.auth.dependencies import get_current_user
 from app.auth.models import User
 from app.database import get_db
@@ -50,4 +50,11 @@ def get_all_units(
     current_user: User = Depends(get_current_user),
 ):
     return unit_service.get_all_units(db, name, position_id, dept_id, skip, limit)
+
+@router.put("/{unit_id}", response_model=UnitBase)
+def update_unit(unit_id: int, unit: UnitUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_unit = unit_service.update_unit(db, unit_id, unit)
+    if db_unit is None:
+        raise HTTPException(status_code=404, detail="Unit not found")
+    return db_unit
 

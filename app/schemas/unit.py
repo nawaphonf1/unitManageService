@@ -8,13 +8,13 @@ class UnitBase(BaseModel):
     identify_id: Optional[str] = None  # เปลี่ยนเป็น str ตามตาราง
     position_id: int
     dept_id: int
-    blood_group_id: Optional[int] = None
+    blood_group_id: Optional[str] = None
     province_id: Optional[int] = None
     district_id: Optional[int] = None
     parish_id: Optional[int] = None
     post_code: Optional[int] = None
     address_detail: Optional[str] = None
-    status: Optional[str] = None  # เพิ่มฟิลด์ status
+    status: Optional[str] = "ready"  # เพิ่มฟิลด์ status
     is_active: Optional[bool] = True  # เพิ่มฟิลด์ is_active และตั้งค่าเริ่มต้นเป็น True
     img_path: Optional[str] = None  # เพิ่มฟิลด์ img_path
     identify_soldier_id: Optional[str] = None  # เพิ่มฟิลด์ identify_soldier_id
@@ -32,8 +32,21 @@ class UnitOut(UnitBase):
     dept_name: str
     position_name: str
 
-class UnitUpdate(UnitBase):
-    pass
+class UnitUpdate(BaseModel):
+    first_name: str
+    last_name: str
+    tel: Optional[str] = None
+    identify_id: Optional[str] = None  # เปลี่ยนเป็น str ตามตาราง
+    position_id: int
+    dept_id: int
+    blood_group_id: Optional[str] = None
+    province_id: Optional[int] = None
+    district_id: Optional[int] = None
+    parish_id: Optional[int] = None
+    post_code: Optional[int] = None
+    address_detail: Optional[str] = None
+    img_path: Optional[str] = None  # เพิ่มฟิลด์ img_path
+    identify_soldier_id: Optional[str] = None  # เพิ่มฟิลด์ identify_soldier_id
 
 class UnitAll(BaseModel):
     name: str

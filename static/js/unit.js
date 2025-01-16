@@ -66,7 +66,7 @@ async function fetchAndDisplayUnits(page = 1) {
                 </td>
                 <td>
                     <button class="btn btn-info btn-sm" data-id="${unit.units_id}" onclick="showMemberDetail(${unit.units_id})">รายละเอียด</button>
-                    <button class="btn btn-warning btn-sm" data-id="${unit.units_id}" onclick="editMember(${unit.units_id})">แก้ไข</button>
+                    <button class="btn btn-warning btn-sm" data-id="${unit.units_id}" onclick="showMemberEdit(${unit.units_id})">แก้ไข</button>
                 </td>
 
             `;
@@ -137,9 +137,6 @@ async function displayUnitsMission(unitId) {
             const year = date.getFullYear() + 543; // แปลง ค.ศ. เป็น พ.ศ.
             return `${day} ${month} ${year}`;
         }
-
-
-
         // Update pagination
         const totalPages = Math.ceil(data.total / rowsPerPage);
         updatePagination(totalPages, page);
@@ -177,62 +174,172 @@ document.addEventListener("DOMContentLoaded", function () {
                     "Authorization": `Bearer ${token}` // Attach the token in the Authorization header
                 }
             });
-    
+
             if (response.status === 401) {
                 alert("Session expired. Redirecting to the homepage.");
                 window.location.href = "/"; // Replace '/' with your homepage URL
                 return;
             }
-    
+
             if (!response.ok) {
                 throw new Error("Failed to fetch unit details.");
             }
-    
+
             const data = await response.json();
             console.log(data);
-    
+
             // แสดงข้อมูลใน modal
             document.getElementById('units-img').src = data.img_path
             // document.getElementById("modalPositionName").textContent = data.position_name;
-            document.getElementById("unitDetailName").innerHTML  = "<strong class='pe-3'>ชื่อ:</strong> "+"<br>" + data.position_name +" "+data.first_name + " " + data.last_name;
-            document.getElementById("deptDetailName").innerHTML  = "<strong class='pe-3'>สังกัด:</strong> "+"<br>" + data.dept_name;
-            document.getElementById("identifyIdDetail").innerHTML  = "<strong class='pe-3'>หมายเลขประจำตัว:</strong> "+"<br>" + data.identify_id;
-            document.getElementById("identifySoldierIdDetail").innerHTML  = "<strong class='pe-3'>หมายเลขประจำตัวทหาร:</strong> "+"<br>" + data.identify_soldier_id;
-            document.getElementById("telDetail").innerHTML  = "<strong class='pe-3'>เบอร์โทร:</strong> "+"<br>" + data.tel;
-            document.getElementById("bloodGroupDetail").innerHTML  = "<strong class='pe-3'>กรุ๊ปเลือด:</strong> "+"<br>" + data.blood_group_id;
-            document.getElementById("addressDetail").innerHTML  = "<strong class='pe-3'>ที่อยู่:</strong> "+"<br>" + data.address_detail;
-            
+            document.getElementById("unitDetailName").innerHTML = "<strong class='pe-3'>ชื่อ:</strong> " + "<br>" + data.position_name + " " + data.first_name + " " + data.last_name;
+            document.getElementById("deptDetailName").innerHTML = "<strong class='pe-3'>สังกัด:</strong> " + "<br>" + data.dept_name;
+            document.getElementById("identifyIdDetail").innerHTML = "<strong class='pe-3'>หมายเลขประจำตัว:</strong> " + "<br>" + data.identify_id;
+            document.getElementById("identifySoldierIdDetail").innerHTML = "<strong class='pe-3'>หมายเลขประจำตัวทหาร:</strong> " + "<br>" + data.identify_soldier_id;
+            document.getElementById("telDetail").innerHTML = "<strong class='pe-3'>เบอร์โทร:</strong> " + "<br>" + data.tel;
+            document.getElementById("bloodGroupDetail").innerHTML = "<strong class='pe-3'>กรุ๊ปเลือด:</strong> " + "<br>" + data.blood_group_id;
+            document.getElementById("addressDetail").innerHTML = "<strong class='pe-3'>ที่อยู่:</strong> " + "<br>" + data.address_detail;
 
-            
+
+
             // document.getElementById("modalTel").textContent = data.tel || "N/A";
             // document.getElementById("modalIdentifyId").textContent = data.identify_id || "N/A";
             // document.getElementById("modalStatus").textContent = data.status || "N/A";
             // document.getElementById("modalAddressDetail").textContent = data.address_detail || "N/A";
-    
+
             // เก็บ member_id สำหรับการดาวน์โหลดรายงาน
             selectedUnitId = unitId;
-    
+
             // เปิด modal
             const unitDetailModal = new bootstrap.Modal(document.getElementById("unitDetailModal"));
             unitDetailModal.show();
             displayUnitsMission(unitId);
-    
+
         } catch (error) {
             console.error("Error fetching member details:", error);
             alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
         }
     }
-    
+
+    async function showMemberEdit(unitId) {
+        try {
+            const response = await fetch(`${apiUrl}units/${unitId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // Attach the token in the Authorization header
+                }
+            });
+
+            if (response.status === 401) {
+                alert("Session expired. Redirecting to the homepage.");
+                window.location.href = "/"; // Replace '/' with your homepage URL
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch unit details.");
+            }
+
+            const data = await response.json();
+            console.log(data);
+
+            // โหลดข้อมูลตำแหน่งจาก API
+            const positionResponse = await fetch(`http://127.0.0.1:8000/api/position`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!positionResponse.ok) {
+                throw new Error("Failed to fetch positions.");
+            }
+
+            const positions = await positionResponse.json();
+
+            // กำหนดตัวเลือกใน dropdown "ยศ"
+            const positionDropdown = document.getElementById("unitEditPosition");
+            positionDropdown.innerHTML = ""; // ลบตัวเลือกเก่า
+            positions.forEach(position => {
+                const option = document.createElement("option");
+                option.value = position.position_id;
+                option.textContent = position.position_name;
+                if (position.position_id === data.position_id) {
+                    option.selected = true; // ตั้งค่าตัวเลือก default
+                }
+                positionDropdown.appendChild(option);
+            });
+
+            // โหลดข้อมูลสังกัดจาก API
+            const deptResponse = await fetch(`http://127.0.0.1:8000/api/dept/`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!deptResponse.ok) {
+                throw new Error("Failed to fetch departments.");
+            }
+
+            const departments = await deptResponse.json();
+
+            // กำหนดตัวเลือกใน dropdown "สังกัด"
+            const deptDropdown = document.getElementById("deptEditName");
+            deptDropdown.innerHTML = ""; // ลบตัวเลือกเก่า
+            departments.forEach(dept => {
+                const option = document.createElement("option");
+                option.value = dept.dept_id;
+                option.textContent = dept.dept_name;
+                if (dept.dept_id === data.dept_id) {
+                    option.selected = true; // ตั้งค่าตัวเลือก default
+                }
+                deptDropdown.appendChild(option);
+            });
+
+            // กำหนดค่าในฟิลด์อื่น
+            document.getElementById("units-img-edit").src = data.img_path;
+
+            document.getElementById("unitEditFirstName").value = data.first_name;
+            document.getElementById("unitEditLastName").value = data.last_name;
+            document.getElementById("identifyIdEdit").value = data.identify_id;
+            document.getElementById("identifySoldierIdEdit").value = data.identify_soldier_id;
+            document.getElementById("telEdit").value = data.tel;
+            document.getElementById("bloodGroupEdit").value = data.blood_group_id;
+            document.getElementById("addressEdit").value = data.address_detail;
+            document.getElementById("save-edit-units").setAttribute("data-units-id", data.units_id);
+
+
+
+            // เปิด modal
+            const unitEditModal = new bootstrap.Modal(document.getElementById("unitEditModal"));
+            unitEditModal.show();
+
+        } catch (error) {
+            console.error("Error fetching member details:", error);
+            alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
+        }
+    }
+
+
+
+
+
 
     fetchAndDisplayUnits(currentPage)
     window.showMemberDetail = showMemberDetail;
+    window.showMemberEdit = showMemberEdit;
+
+
     window.displayUnitsMission = displayUnitsMission; // ให้ฟังก์ชันใช้ได้ใน scope ทั่วไป
 });
 
 
 document.getElementById("upload-image-btn").addEventListener("click", async () => {
     const imageInput = document.getElementById("units-image");
-    const unitsImg = document.getElementById("units-img");
+    const unitsImg = document.getElementById("units-img-edit");
 
     if (imageInput.files.length === 0) {
         alert("กรุณาเลือกไฟล์รูปภาพ");
@@ -253,10 +360,152 @@ document.getElementById("upload-image-btn").addEventListener("click", async () =
         }
 
         const result = await response.json();
+
+        console.log(result.imageUrl);
         alert("อัพโหลดรูปภาพสำเร็จ");
         unitsImg.src = result.imageUrl; // ตั้งค่ารูปภาพที่อัพโหลด
     } catch (error) {
         console.error("Error uploading image:", error);
         alert("การอัพโหลดรูปภาพผิดพลาด");
+    }
+});
+
+document.getElementById("save-edit-units").addEventListener("click", async () => {
+    const unitEditPosition = document.getElementById("unitEditPosition").value;
+    const unitEditFirstName = document.getElementById("unitEditFirstName").value;
+    const unitEditLastName = document.getElementById("unitEditLastName").value;
+    const identifyIdEdit = document.getElementById("identifyIdEdit").value;
+    const deptEditName = document.getElementById("deptEditName").value;
+
+    const identifySoldierIdEdit = document.getElementById("identifySoldierIdEdit").value;
+    const telEdit = document.getElementById("telEdit").value;
+    const bloodGroupEdit = document.getElementById("bloodGroupEdit").value;
+    const addressEdit = document.getElementById("addressEdit").value;
+
+    const unitsId = document.getElementById("save-edit-units").getAttribute("data-units-id");
+
+
+
+
+    // ใช้ URL จากรูปที่อัพโหลด
+    const unitsImg = document.getElementById("units-img-edit");
+    const imgPath = unitsImg.src && unitsImg.style.display !== "none" ? unitsImg.src : null;
+
+    const payload = {
+        img_path: imgPath,
+        position_id: unitEditPosition,
+        first_name: unitEditFirstName,
+        last_name: unitEditLastName,
+        dept_id: deptEditName,
+        identify_id: identifyIdEdit,
+        identify_soldier_id: identifySoldierIdEdit,
+        tel: telEdit,
+        boold_group_id: bloodGroupEdit,
+        address_detail: addressEdit
+    };
+
+    console.log(payload);
+
+    fetch(`http://127.0.0.1:8000/api/unit/${unitsId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload),
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok " + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert("แก้ไขสำเร็จ!");
+            location.reload();
+        })
+        .catch(error => {
+            console.error("เกิดข้อผิดพลาด:", error);
+            alert("เกิดข้อผิดพลาดในการแก้ไขข้อมูล");
+        });
+
+});
+
+
+document.getElementById("unitAddModal").addEventListener("click", async () => {
+    try {
+
+        // โหลดข้อมูลตำแหน่งจาก API
+        const positionResponse = await fetch(`http://127.0.0.1:8000/api/position`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!positionResponse.ok) {
+            throw new Error("Failed to fetch positions.");
+        }
+
+        const positions = await positionResponse.json();
+
+        const positionDropdown = document.getElementById("unitAddPosition");
+
+        // เก็บค่าที่เลือกไว้ก่อนหน้านี้ (ถ้ามี)
+        const previousValue = positionDropdown.value;
+
+        positionDropdown.innerHTML = ""; // ลบตัวเลือกเก่า
+        positions.forEach(position => {
+            const option = document.createElement("option");
+            option.value = position.position_id;
+            option.textContent = position.position_name;
+
+            // ตั้งค่า selected หากตรงกับค่าที่เลือกไว้ก่อนหน้า
+            if (position.position_id.toString() === previousValue) {
+                option.selected = true;
+            }
+
+            positionDropdown.appendChild(option);
+        });
+
+
+        // โหลดข้อมูลสังกัดจาก API
+        const deptResponse = await fetch(`http://127.0.0.1:8000/api/dept/`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        if (!deptResponse.ok) {
+            throw new Error("Failed to fetch departments.");
+        }
+
+        const departments = await deptResponse.json();
+
+        // กำหนดตัวเลือกใน dropdown "สังกัด"
+        const deptDropdown = document.getElementById("deptAddName");
+
+        // เก็บค่าที่เลือกไว้ก่อนหน้านี้ (ถ้ามี)
+        const previousdeptDropdownValue = deptDropdown.value;
+
+        deptDropdown.innerHTML = ""; // ลบตัวเลือกเก่า
+        departments.forEach(dept => {
+            const option = document.createElement("option");
+            option.value = dept.dept_id;
+            option.textContent = dept.dept_name;
+
+            // ตั้งค่า selected หากตรงกับค่าที่เลือกไว้ก่อนหน้า
+            if (dept.dept_id.toString() === previousdeptDropdownValue) {
+                option.selected = true;
+            }
+            deptDropdown.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error("Error fetching member details:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
     }
 });

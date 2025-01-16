@@ -17,7 +17,7 @@ class Unit(Base):
     tel = Column(String(10), nullable=True)
     position_id = Column(Integer, nullable=False)
     dept_id = Column(Integer, nullable=False)
-    blood_group_id = Column(Integer, nullable=True)
+    blood_group_id = Column(String(2), nullable=True)
     province_id = Column(Integer, nullable=True)
     district_id = Column(Integer, nullable=True)
     parish_id = Column(Integer, nullable=True)
