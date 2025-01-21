@@ -103,7 +103,7 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
 
 async function displayUnitsMission(unitId) {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/api/mission/units/${unitId}`, {
+        const response = await fetch(`/api/mission/units/${unitId}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(data);
 
             // โหลดข้อมูลตำแหน่งจาก API
-            const positionResponse = await fetch(`http://127.0.0.1:8000/api/position`, {
+            const positionResponse = await fetch(`/api/position`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -292,7 +292,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             // โหลดข้อมูลสังกัดจาก API
-            const deptResponse = await fetch(`http://127.0.0.1:8000/api/dept/`, {
+            const deptResponse = await fetch(`/api/dept/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -343,17 +343,45 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
-
-
-
-
     fetchAndDisplayUnits(currentPage)
     window.showMemberDetail = showMemberDetail;
     window.showMemberEdit = showMemberEdit;
 
 
     window.displayUnitsMission = displayUnitsMission; // ให้ฟังก์ชันใช้ได้ใน scope ทั่วไป
+});
+
+document.getElementById("add-upload-image-btn").addEventListener("click", async () => {
+    const imageInput = document.getElementById("add-units-image");
+    const unitsImg = document.getElementById("add-units-img");
+
+    if (imageInput.files.length === 0) {
+        alert("กรุณาเลือกไฟล์รูปภาพ");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", imageInput.files[0]);
+
+    try {
+        const response = await fetch("/api/unit/upload-image", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error("การอัพโหลดล้มเหลว");
+        }
+
+        const result = await response.json();
+
+        console.log(result.imageUrl);
+        alert("อัพโหลดรูปภาพสำเร็จ");
+        unitsImg.src = result.imageUrl; // ตั้งค่ารูปภาพที่อัพโหลด
+    } catch (error) {
+        console.error("Error uploading image:", error);
+        alert("การอัพโหลดรูปภาพผิดพลาด");
+    }
 });
 
 
@@ -370,7 +398,7 @@ document.getElementById("upload-image-btn").addEventListener("click", async () =
     formData.append("file", imageInput.files[0]);
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/api/unit/upload-image", {
+        const response = await fetch("api/unit/upload-image", {
             method: "POST",
             body: formData,
         });
@@ -426,7 +454,7 @@ document.getElementById("save-edit-units").addEventListener("click", async () =>
 
     console.log(payload);
 
-    fetch(`http://127.0.0.1:8000/api/unit/${unitsId}`, {
+    fetch(`/api/unit/${unitsId}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -456,7 +484,7 @@ document.getElementById("unitAddModal").addEventListener("click", async () => {
     try {
 
         // โหลดข้อมูลตำแหน่งจาก API
-        const positionResponse = await fetch(`http://127.0.0.1:8000/api/position`, {
+        const positionResponse = await fetch(`/api/position`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -491,7 +519,7 @@ document.getElementById("unitAddModal").addEventListener("click", async () => {
 
 
         // โหลดข้อมูลสังกัดจาก API
-        const deptResponse = await fetch(`http://127.0.0.1:8000/api/dept/`, {
+        const deptResponse = await fetch(`/api/dept/`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -544,7 +572,7 @@ document.getElementById("save-add-units").addEventListener("click", async () => 
         const bloodGroupAdd = document.getElementById("bloodGroupAdd").value;
         const addressAdd = document.getElementById("addressAdd").value;
 
-        const unitsImg = document.getElementById("units-img-edit");
+        const unitsImg = document.getElementById("units-img-add");
         const imgPath = unitsImg.src && unitsImg.style.display !== "none" ? unitsImg.src : null;
 
         const payload = {
@@ -561,7 +589,7 @@ document.getElementById("save-add-units").addEventListener("click", async () => 
         };
 
         // โหลดข้อมูลตำแหน่งจาก API
-        const positionResponse = await fetch(`http://127.0.0.1:8000/api/unit`, {
+        const positionResponse = await fetch(`/api/unit`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -588,7 +616,7 @@ document.getElementById("filter-units").addEventListener("click", async () => {
     try {
 
         // โหลดข้อมูลตำแหน่งจาก API
-        const positionResponse = await fetch(`http://127.0.0.1:8000/api/position`, {
+        const positionResponse = await fetch(`/api/position`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -628,7 +656,7 @@ document.getElementById("filter-units").addEventListener("click", async () => {
 
 
         // โหลดข้อมูลสังกัดจาก API
-        const deptResponse = await fetch(`http://127.0.0.1:8000/api/dept/`, {
+        const deptResponse = await fetch(`/api/dept/`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",

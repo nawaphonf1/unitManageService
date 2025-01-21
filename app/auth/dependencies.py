@@ -15,7 +15,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
         )
-    print(payload)
     username = payload.username
     if username is None:
         raise HTTPException(

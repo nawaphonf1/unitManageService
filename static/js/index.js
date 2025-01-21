@@ -14,7 +14,7 @@ let token = getCookie("access_token");
 
 // Redirect to home if no token
 if (!token) {
-    window.location.href = "/"; // Replace '/' with your homepage URL if different
+    // window.location.href = "/"; // Replace '/' with your homepage URL if different
 }
 
 // API endpoint URL
@@ -34,7 +34,7 @@ async function fetchAndDisplayUnits() {
         if (response.status === 401) {
             // If the token is invalid or expired, redirect to the homepage
             alert("Session expired. Redirecting to the homepage.");
-            window.location.href = "/"; // Replace '/' with your homepage URL
+            // window.location.href = "/"; // Replace '/' with your homepage URL
             return;
         }
 

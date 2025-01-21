@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="/static/css/index.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-1 bg-dark text-white vh-100 text-center h-100 position-fixed">
+            <div class="mb-3 mt-3">
+                <img src="/static/img/logo.png" alt="Logo" class="rounded mx-auto d-block" style="max-width: 70px;">
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item py-2 hover-sidebar">
+                    <a class="nav-link text-white" href="http://127.0.0.1:8000/index">
+                        <img src="/static/img/dashboard.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        สรุปยอด
+                    </a>
+                </li>
+                <li class="nav-item py-2 hover-sidebar">
+                    <a class="nav-link text-white" href="/mission">
+                        <img src="/static/img/package.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        จัดการภารกิจ
+                    </a>
+                </li>
+                <li class="nav-item py-2 hover-sidebar">
+
+                    <a class="nav-link text-white" href="/unit">
+                        <img src="/static/img/multiple-users-silhouette.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        จัดการกำลังพล
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-11 p-4 ms-auto">
+            <h5 class="text-center pb-4">จัดการภารกิจ</h5>
+            <div class="d-flex justify-content-end mb-3">
+                <button type="button" id="addUnitBtn" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#unitAddModal">+ กำลังพล</button>
+                <button type="button" id="filter-units" class="btn btn-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">ตัวกรอง</button>
+            </div>
+
+            <table class="table table-bordered table-striped">
+                <thead class="table-primery text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>ภารกิจ</th>
+                        <th>วันที่เริ่มต้น</th>
+                        <th>วันที่สิ้นสุด</th>
+                        <th>สถานะ</th>
+                    </tr>
+                </thead>
+                <tbody id="missionTableBody" class="text-center">
+                    <!-- Rows will be dynamically inserted here -->
+                </tbody>
+            </table>
+
+            <nav>
+                <ul class="pagination justify-content-center" id="pagination">
+                </ul>
+            </nav>
+        </div>
+
+        <!-- filter -->
+        <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-center" id="filterModalLabel">กรองรายชื่อ</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <div>
+                                                <label for="filterPosition">ยศ</label>
+                                                <select class="form-select" id="filterPosition">
+                                                    <option selected></option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label for="filterName">ชื่อ</label>
+                                                <input type="text" class="form-control" id="filterName">
+                                            </div>
+                                            <div>
+                                                <label for="filterDept">สังกัด</label>
+                                                <select class="form-select" id="filterDept">
+                                                    <option selected></option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label for="filterStatus">สถานะ</label>
+                                                <select class="form-select" id="filterStatus">
+                                                    <option selected></option>
+                                                    <option value="ready">ว่าง</option>
+                                                    <option value="not ready">ไม่ว่าง</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-success text-white" id="submit-filter-units">กรองข้อมูล</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- add -->
+        <div class="modal fade" id="unitAddModal" tabindex="-1" aria-labelledby="unitAddModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="unitAddModalLabel">เพิ่มรายชื่อกำลังพล</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <img id="add-units-img" src="" class="rounded mx-auto d-block mb-3" alt="units Image" style="max-width: 300px; max-height: 300px;">
+
+                                    <div class="input-group mb-3">
+                                        <input type="file" class="form-control" id="add-units-image">
+                                        <label class="input-group-text" id="add-upload-image-btn">อัพโหลดรูป</label>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <div>
+                                                <label for="unitAddPosition">ยศ</label>
+                                                <select class="form-select" id="unitAddPosition"></select>
+                                            </div>
+                                            
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="unitAddFirstName">ชื่อ</label>
+                                                    <input type="text" class="form-control" id="unitAddFirstName">
+                                                </div>
+    
+                                                <div class="col-6">
+                                                    <label for="unitAddLastName">นามสกุล</label>
+                                                    <input type="text" class="form-control" id="unitAddLastName">
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label for="deptAddName">สังกัด</label>
+                                                <select class="form-select" id="deptAddName"></select>
+                                            </div>
+                                            
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="identifyIdAdd">หมายเลขประจำตัวประชาชน</label>
+                                                    <input type="text" class="form-control" id="identifyIdAdd">
+                                                </div>
+    
+                                                <div class="col-6">
+                                                    <label for="identifySoldierIdAdd">หมายเลขประจำตัวทหาร</label>
+                                                    <input type="text" class="form-control" id="identifySoldierIdAdd">
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="telAdd">เบอร์โทร</label>
+                                                    <input type="text" class="form-control" id="telAdd">
+                                                </div>
+    
+                                                <div class="col-6">
+                                                    <label for="bloodGroupAdd">กรุ๊ปเลือด</label>
+                                                    <input type="text" class="form-control" id="bloodGroupAdd">
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label for="addressAdd">ที่อยู่</label>
+                                                <textarea rows="3" type="text" class="form-control" id="addressAdd"></textarea>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="button" class="btn btn-warning text-white" id="save-add-units">บันทึก</button>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- detail -->
+        <div class="modal fade" id="missionDetailModal" tabindex="-1" aria-labelledby="missionDetailModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="missionDetailModalLabel">รายละเอียดภารกิจ</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <!-- <div class="input-group mb-3">
+                                        <input type="file" class="form-control" id="units-image">
+                                        <label class="input-group-text" id="upload-image-btn">อัพโหลดรูป</label>
+                                    </div> -->
+
+
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <div class="row">
+                                                <p id="missionDetailName" class="form-label">ชื่อภารกิจ</p>
+                                                <hr>
+                                                <p id="missionDetailDateStart" class="form-label">วันที่เริ่มต้น</p>
+                                                <hr>
+                                                <p id="missionDetailDateEnd" class="form-label">วันที่สิ้นสุด</p>
+                                                <hr>
+
+                                                <p id="missionDetail" class="form-label">รายละเอียดภารกิจ</p>
+                                                <hr>
+
+                                                <p id="missiontypeDetail" class="form-label">ประเภทภารกิจ</p>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- edit -->
+        <div class="modal fade" id="unitEditModal" tabindex="-1" aria-labelledby="unitEditModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="unitEditModalLabel">รายละเอียดสมาชิก</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <img id="units-img-edit" src="" class="rounded mx-auto d-block mb-3" alt="units Image" style="max-width: 300px; max-height: 300px;">
+
+                                    <div class="input-group mb-3">
+                                        <input type="file" class="form-control" id="units-image">
+                                        <label class="input-group-text" id="upload-image-btn">อัพโหลดรูป</label>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <div>
+                                                <label for="unitEditPosition">ยศ</label>
+                                                <select class="form-select" id="unitEditPosition"></select>
+                                            </div>
+                                            
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="unitEditFirstName">ชื่อ</label>
+                                                    <input type="text" class="form-control" id="unitEditFirstName">
+                                                </div>
+    
+                                                <div class="col-6">
+                                                    <label for="unitEditLastName">นามสกุล</label>
+                                                    <input type="text" class="form-control" id="unitEditLastName">
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label for="deptEditName">สังกัด</label>
+                                                <select class="form-select" id="deptEditName"></select>
+                                            </div>
+                                            
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="identifyIdEdit">หมายเลขประจำตัวประชาชน</label>
+                                                    <input type="text" class="form-control" id="identifyIdEdit">
+                                                </div>
+    
+                                                <div class="col-6">
+                                                    <label for="identifySoldierIdEdit">หมายเลขประจำตัวทหาร</label>
+                                                    <input type="text" class="form-control" id="identifySoldierIdEdit">
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <label for="telEdit">เบอร์โทร</label>
+                                                    <input type="text" class="form-control" id="telEdit">
+                                                </div>
+    
+                                                <div class="col-6">
+                                                    <label for="bloodGroupEdit">กรุ๊ปเลือด</label>
+                                                    <input type="text" class="form-control" id="bloodGroupEdit">
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label for="addressEdit">ที่อยู่</label>
+                                                <textarea rows="3" type="text" class="form-control" id="addressEdit"></textarea>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="button" class="btn btn-warning text-white" id="save-edit-units">บันทึก</button>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="static/js/mission.js"></script>
+</body>
+
+</html>

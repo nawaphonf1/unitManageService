@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import date, time
+from datetime import date, time, datetime
 from typing import Optional
 
 class MissionBase(BaseModel):
@@ -31,7 +31,7 @@ class MissionUpdate(BaseModel):
 
 class MissionOut(MissionBase):
     mission_id: int
-    created_at: time
+    created_at: Optional[datetime]
 
 class MissionUnits(BaseModel):
     mission_id: int
@@ -40,3 +40,9 @@ class MissionUnits(BaseModel):
     mission_start: date
     mission_end: date
     mission_status: str
+
+class MissionResponse(BaseModel):
+    missions: list[MissionOut]
+    total: int
+    skip: int
+    limit: int

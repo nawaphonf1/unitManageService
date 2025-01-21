@@ -9,7 +9,7 @@ from ...models.unit import Unit
 
 from app.services.mission_service import MissionService
 
-from app.schemas.mission import MissionCreate, MissionOut, MissionUpdate, MissionUnits
+from app.schemas.mission import MissionCreate, MissionOut, MissionUpdate, MissionUnits, MissionResponse
 from app.auth.dependencies import get_current_user
 from app.auth.models import User
 from app.database import get_db
@@ -25,3 +25,17 @@ def get_unit(unit_id: int, db: Session = Depends(get_db), current_user: User = D
     if db_unit is None:
         raise HTTPException(status_code=404, detail="Unit not found")
     return db_unit
+
+#get all missions
+@router.get("/", response_model=MissionResponse)
+def get_missions(skip: int = 0,limit: int = 100, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_missions = MissionService.get_missions(db, skip, limit)
+    return db_missions 
+
+#get mission by id
+@router.get("/{mission_id}", response_model=MissionOut)
+def get_mission(mission_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_mission = MissionService.get_mission_by_id(db, mission_id=mission_id)
+    if db_mission is None:
+        raise HTTPException(status_code=404, detail="Mission not found")
+    return db_mission

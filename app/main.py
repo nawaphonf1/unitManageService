@@ -42,3 +42,7 @@ def index_page(request: Request):
 def unit_page(request: Request):
     return templates.TemplateResponse("unit.html", {"request": request})
 
+@app.get("/mission")
+def unit_page(request: Request):
+    return templates.TemplateResponse("mission.html", {"request": request})
+

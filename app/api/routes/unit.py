@@ -46,7 +46,7 @@ def get_all_units(
     dept_id: Optional[int] = None,
     status: Optional[str] = None,
     skip: int = 0,
-    limit: int = 100,
+    limit: int = 100, 
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
