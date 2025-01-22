@@ -13,6 +13,12 @@ from app.schemas.mission import UpdateMissionUnitParam
 from datetime import date
 
 class MissionService:
+    def del_mission(db, mission_id):
+        print(mission_id)
+        # อัปเดตค่า is_active เป็น 0 โดยระบุเงื่อนไขที่ต้องการ
+        db.query(Mission).filter(Mission.mission_id == mission_id).update({"is_active": 0})
+        db.commit()  # อย่าลืม commit เพื่อบันทึกการเปลี่ยนแปลง
+
     def create_mission(db: Session, data: UpdateMissionUnitParam):
         mission = Mission()
 
@@ -47,7 +53,10 @@ class MissionService:
             Mission.mission_status,
         ).\
         join(MissionUnit, Mission.mission_id == MissionUnit.mission_id).\
-        filter(MissionUnit.unit_id == unit_id).all()
+        filter(and_(
+            MissionUnit.unit_id == unit_id,
+            Mission.is_active == True
+        )).all()
 
         return query
     
@@ -61,7 +70,8 @@ class MissionService:
             Mission.is_active,
             Mission.created_at,
             Mission.mission_type
-        ).offset(skip).limit(limit)
+        ).filter(Mission.is_active == True).offset(skip).limit(limit)
+        
 
         # Get total count for pagination
         total = query.with_entities(func.count()).scalar()
@@ -99,7 +109,10 @@ class MissionService:
             Mission.created_at,
             Mission.mission_type,
             Mission.mission_detail
-        ).filter(Mission.mission_id == mission_id).first()
+        ).filter(and_(
+            Mission.mission_id == mission_id,
+            Mission.is_active == True
+        )).first()
 
         if query is None:
             return None  # คืน None เพื่อให้ตรวจสอบได้ใน Controller
@@ -176,7 +189,8 @@ class MissionService:
             join(Mission, Mission.mission_id == MissionUnit.mission_id).\
             filter(and_(
                 Mission.mission_start <= current_date,
-                Mission.mission_end >= current_date
+                Mission.mission_end >= current_date,
+                Mission.is_active == True
             )).all()
 
         # สร้างรายการ units_id ที่ไม่พร้อม

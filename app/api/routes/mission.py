@@ -63,3 +63,8 @@ def update_mission_units(mission_id:int, data:UpdateMissionUnitParam ,db: Sessio
         raise HTTPException(status_code=404, detail="Mission not found")
     MissionService.update_status_unit(db)
     return db_mission
+
+@router.delete("/{mission_id}", response_model=None)
+def del_mission(mission_id:int,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_mission = MissionService.del_mission(db,mission_id)
+    return db_mission
