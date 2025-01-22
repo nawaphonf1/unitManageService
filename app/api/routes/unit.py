@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException,  File, UploadFile
 from pathlib import Path
 import shutil
 from typing import List
+from fastapi.responses import StreamingResponse
 
 from sqlalchemy.orm import Session
 from ...database import SessionLocal
@@ -70,3 +71,12 @@ def get_units_active(position_id:Optional[int] = None,first_name:Optional[str] =
         raise HTTPException(status_code=404, detail="Unit not found")
     return db_unit
 
+@router.get("/export_units")
+async def export_units(db: Session = Depends(get_db)):
+    excel_file = unit_service.export_units(db,)
+
+    return StreamingResponse(
+        excel_file,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=unitExport.xlsx"}
+    )

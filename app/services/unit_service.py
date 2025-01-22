@@ -7,6 +7,24 @@ from app.models.dept import Dept
 
 from app.schemas.unit import UnitCreate, UnitAll, UnitResponse, UnitUpdate
 
+import pandas as pd
+import os
+import datetime
+from datetime import timedelta
+
+from io import BytesIO
+from openpyxl.drawing.image import Image
+
+from sqlalchemy.orm import Session
+
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
+from openpyxl.utils import get_column_letter
+from io import BytesIO
+
+from sqlalchemy import and_, func
+
+
 def create_unit(db: Session, unit: UnitCreate):
     db_unit = Unit(**unit.dict())
     db.add(db_unit)
@@ -145,4 +163,117 @@ def get_units_active(db, position_id, first_name,last_name):
     unit.all()
 
     return unit
+
+
+import requests
+from io import BytesIO
+from PIL import Image as PILImage
+from openpyxl.drawing.image import Image as openpyxl_Image
+
+def export_units(db):
+    data = db.query(
+                Unit.img_path,
+                Position.position_name_short,
+                Unit.first_name,
+                Unit.last_name,
+                Dept.dept_name_short,
+                Unit.identify_id,
+                Unit.identify_soldier_id,
+                Unit.tel,
+                Unit.blood_group_id,
+                Unit.address_detail
+            ).\
+            join(Position, Position.position_id == Unit.position_id).\
+            join(Dept, Dept.dept_id == Unit.dept_id).\
+            all()
+            
+    orders_list = []
+    index = 1
+    for item in data:
+        orders_list.append({
+            "ลำดับ": index,
+            "รูปภาพ": item.img_path,
+            "ยศ": item.position_name_short,
+            "ชื่อ": item.first_name,
+            "นามสกุล": item.last_name,
+            "สังกัด": item.dept_name_short,
+            "หมายเลขประจำตัว": item.identify_id,
+            "หมายเลขประจำตัวทหาร": item.identify_soldier_id,
+            "เบอร์โทร": item.tel,
+            "กรุ๊ปเลือด": item.blood_group_id,
+            "ที่อยู่": item.address_detail
+        })
+        index += 1
+
+    # สร้าง DataFrame จากข้อมูล
+    df = pd.DataFrame(orders_list)
+
+    # สร้างไฟล์ Excel พร้อม Style
+    excel_file = BytesIO()
+
+    with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name="รายงาน")
+        workbook = writer.book
+        worksheet = writer.sheets["รายงาน"]
+
+        # ปรับความกว้างของคอลัมน์
+        for column_cells in worksheet.columns:
+            max_length = 0
+            col_letter = column_cells[0].column_letter
+            for cell in column_cells:
+                try:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                except:
+                    pass
+            worksheet.column_dimensions[col_letter].width = max_length + 2
+
+        # กำหนด Style
+        header_font = Font(bold=True, color="FFFFFF")
+        header_fill = PatternFill(fill_type="solid", fgColor="4F81BD")
+        border_style = Border(
+            left=Side(border_style="thin"),
+            right=Side(border_style="thin"),
+            top=Side(border_style="thin"),
+            bottom=Side(border_style="thin"),
+        )
+        alignment = Alignment(horizontal="center", vertical="center")
+
+        # จัดการหัวตาราง
+        for cell in worksheet[1]:
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.border = border_style
+            cell.alignment = alignment
+
+        # แทรกรูปภาพในคอลัมน์ "รูปภาพ"
+        for i, item in enumerate(data, start=2):  # เริ่มที่แถวที่ 2 (แถวข้อมูล)
+            print(item)
+            img_path = item.img_path
+            if img_path:  # เช็คว่ามี path ของภาพ
+                try:
+                    # ดาวน์โหลดภาพจาก URL
+                    response = requests.get(img_path)
+                    if response.status_code == 200:
+                        img = PILImage.open(BytesIO(response.content))
+                        img = img.resize((40, 40))  # ปรับขนาดรูปภาพเป็น 40x40 พิกเซล
+
+                        # แปลงรูปภาพให้เป็น Image ของ openpyxl
+                        img_io = BytesIO()
+                        img.save(img_io, format="PNG")
+                        img_io.seek(0)
+
+                        img_openpyxl = openpyxl_Image(img_io)
+                        img_openpyxl.width = 40
+                        img_openpyxl.height = 40
+
+                        # แทรกภาพลงในเซลล์ที่ต้องการ (คอลัมน์ "รูปภาพ")
+                        worksheet.add_image(img_openpyxl, f'A{i}')  # แทรกในคอลัมน์ "A" ที่แถว i
+                    else:
+                        print(f"Failed to download image from {img_path}")
+                except Exception as e:
+                    print(f"Error loading image {img_path}: {e}")
+    # รีเซ็ต pointer และส่งไฟล์
+    excel_file.seek(0)
+    return excel_file
 
