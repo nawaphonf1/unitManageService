@@ -7,7 +7,7 @@ class UnitBase(BaseModel):
     tel: Optional[str] = None
     identify_id: Optional[str] = None  # เปลี่ยนเป็น str ตามตาราง
     position_id: int
-    dept_id: int
+    dept_id: Optional[int] = None
     blood_group_id: Optional[str] = None
     province_id: Optional[int] = None
     district_id: Optional[int] = None

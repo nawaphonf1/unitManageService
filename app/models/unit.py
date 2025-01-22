@@ -16,7 +16,7 @@ class Unit(Base):
     last_name = Column(String(100), nullable=False)
     tel = Column(String(10), nullable=True)
     position_id = Column(Integer, nullable=False)
-    dept_id = Column(Integer, nullable=False)
+    dept_id = Column(Integer, nullable=True)
     blood_group_id = Column(String(2), nullable=True)
     province_id = Column(Integer, nullable=True)
     district_id = Column(Integer, nullable=True)

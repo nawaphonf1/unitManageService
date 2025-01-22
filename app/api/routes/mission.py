@@ -68,3 +68,9 @@ def update_mission_units(mission_id:int, data:UpdateMissionUnitParam ,db: Sessio
 def del_mission(mission_id:int,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_mission = MissionService.del_mission(db,mission_id)
     return db_mission
+
+@router.post("/import_excel")
+async def import_excel(db: Session = Depends(get_db),current_user: User = Depends(get_current_user),file: UploadFile = File(...)):
+    db_mission = await MissionService.import_excel(db,file)
+    return db_mission
+    

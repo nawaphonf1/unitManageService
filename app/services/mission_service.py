@@ -11,6 +11,8 @@ from app.schemas.unit import UnitCreate, UnitAll
 from app.schemas.mission import UpdateMissionUnitParam
 
 from datetime import date
+from io import BytesIO
+import pandas as pd
 
 class MissionService:
     def del_mission(db, mission_id):
@@ -215,6 +217,30 @@ class MissionService:
             mission.mission_status = "r" if mission.mission_start <=  current_date and mission.mission_end >= current_date else "nr"
         
         db.commit()
+
+    async def import_excel(db, file):
+        try:
+            # อ่านไฟล์ Excel จาก memory (BytesIO) ด้วย pandas
+            content = await file.read()
+            df = pd.read_excel(BytesIO(content))
+            data = []
+
+            # ตรวจสอบข้อมูลใน Excel
+            for index, row in df.iterrows():
+                # ตรวจสอบว่าค่าของ 'Unnamed: 1' หรือคอลัมน์อื่น ๆ ไม่เป็น NaN
+                if pd.notna(row['Unnamed: 1']) and pd.notna(row['Unnamed: 2']) and pd.notna(row['Unnamed: 3']) and pd.notna(row['Unnamed: 4']):
+                    data.append({
+                        'dept_name': row['Unnamed: 1'],
+                        'first_name': row['Unnamed: 2'],
+                        'last_name': row['Unnamed: 3'],
+                        'identify_soldier_id': row['Unnamed: 4'],
+                    })
+
+            print(data)
+
+        except Exception as e:
+            return {"error": str(e)}
+
 
         
 
