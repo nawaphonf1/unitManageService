@@ -48,7 +48,7 @@
         <div class="col-md-11 p-4 ms-auto">
             <h5 class="text-center pb-4">จัดการภารกิจ</h5>
             <div class="d-flex justify-content-end mb-3">
-                <button type="button" id="addUnitBtn" class="btn btn-success btn-sm" data-bs-toggle="modal"
+                <button type="button" id="addMissionBtn" class="btn btn-success btn-sm" data-bs-toggle="modal"
                     data-bs-target="#missionAddModal">+ ภารกิจ</button>
                 <button type="button" id="filter-units" class="btn btn-secondary btn-sm ms-2" data-bs-toggle="modal"
                     data-bs-target="#filterModal">ตัวกรอง</button>
@@ -328,7 +328,7 @@
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="missionAddModalLabel">รายละเอียดภารกิจ</h5>
+                        <h5 class="modal-title" id="missionAddModalLabel">เพิ่มภารกิจ</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -367,7 +367,8 @@
 
                                             <div>
                                                 <label for="missionStatusAdd"><strong>สถานะ :</strong></label>
-                                                <input type="text" class="form-control" id="missionStatusAdd" placeholder="กำลังดำเนินการ" readonly>
+                                                <input type="text" class="form-control" id="missionStatusAdd"
+                                                    placeholder="กำลังดำเนินการ" readonly>
                                             </div>
 
                                         </div>
@@ -384,7 +385,7 @@
                                             </div>
                                             <div class="col-6 text-end">
                                                 <button class="btn btn-success" data-bs-target="#addUnitFromAddModel"
-                                                    data-bs-toggle="modal" data-bs-dismiss="modal"> + </button>
+                                                    data-bs-toggle="modal" data-bs-dismiss="modal" id="addUnitFromAddModel2"> + </button>
                                             </div>
                                         </div>
 
@@ -411,7 +412,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">เพิ่ม</button>
+                        <button type="button" class="btn btn-success" id="addMissionNewUnits">เพิ่ม</button>
                     </div>
                 </div>
             </div>
@@ -454,7 +455,8 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <button type="button" class="btn btn-primary" id="submitFilterAddUnitModel">ค้นหา</button>
+                                    <button type="button" class="btn btn-primary"
+                                        id="submitFilterAddUnitModel">ค้นหา</button>
                                 </div>
                             </div>
                         </div>
@@ -479,6 +481,73 @@
                         <button class="btn btn-danger" data-bs-target="#missionEditModal" data-bs-toggle="modal"
                             data-bs-dismiss="modal">ยกเลิก</button>
                         <button class="btn btn-success" id="confirmAddUnitEdit">ยืนยัน</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- add units from add -->
+        <div class="modal fade" id="addUnitFromAddModel" aria-hidden="true" aria-labelledby="addUnitFromAddModelLebel"
+            tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">เพิ่มรายชื่อ</h5>
+                        <button type="button" class="btn-close" data-bs-target="#missionAddModal"
+                            data-bs-toggle="modal" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-2">
+                            <a class="" data-bs-toggle="collapse" href="#collapseFilter" role="button"
+                                aria-expanded="false" aria-controls="collapseFilter">
+                                ค้นหา :
+                            </a>
+
+                            <div class="collapse ms-3 me-3 " id="collapseFilter">
+                                <div class="row mb-2">
+                                    <div class="col-12">
+                                        <label for="filterPositionAddUnitModelAdd">ยศ</label>
+                                        <select class="form-select" id="filterPositionAddUnitModelAdd">
+                                            <option selected></option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="filterfirstNameAddUnitModelAdd">ชื่อ</label>
+                                        <input type="text" id="filterfirstNameAddUnitModelAdd" class="form-control">
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="filterLastNameAddUnitModelAdd">นามสกุล</label>
+                                        <input type="text" id="filterLastNameAddUnitModelAdd" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <button type="button" class="btn btn-primary"
+                                        id="submitFilterAddUnitModelAdd">ค้นหา</button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <table class="table text-center">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">ยศ</th>
+                                    <th scope="col">ชื่อ</th>
+                                    <th scope="col">นามสกุล</th>
+                                </tr>
+                            </thead>
+                            <tbody id="addUnitFromAddModelTableBody">
+                                <!-- Rows will be dynamically inserted here -->
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" data-bs-target="#missionAddModal" data-bs-toggle="modal"
+                            data-bs-dismiss="modal">ยกเลิก</button>
+                        <button class="btn btn-success" id="confirmAddUnitAdd">ยืนยัน</button>
 
                     </div>
                 </div>

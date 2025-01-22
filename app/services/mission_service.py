@@ -13,6 +13,30 @@ from app.schemas.mission import UpdateMissionUnitParam
 from datetime import date
 
 class MissionService:
+    def create_mission(db: Session, data: UpdateMissionUnitParam):
+        mission = Mission()
+
+        mission.mission_name = data.mission_name
+        mission.mission_start = data.mission_start
+        mission.mission_end = data.mission_end
+        mission.mission_detail = data.mission_detail
+        mission.mission_type = data.mission_type
+        mission.mission_status = "r"  # ใช้สถานะที่มีความหมาย เช่น "ready" แทน "r"
+        
+        db.add(mission)
+        db.commit()  # ทำการ commit เพื่อบันทึกภารกิจ
+        db.refresh(mission)  # รีเฟรช mission หลังจาก commit เพื่อให้ได้ข้อมูลที่อัปเดตล่าสุด
+
+        # เพิ่ม mission units ใหม่
+        for unit_id in data.mission_unit_id:
+            new_mission_unit = MissionUnit(mission_id=mission.mission_id, unit_id=unit_id)
+            db.add(new_mission_unit)
+
+        db.commit()  # ทำการ commit เพื่อบันทึก mission units ใหม่
+
+        return mission
+
+
     def get_mission_by_units_id(db: Session, unit_id: int):
         query = db.query(
             Mission.mission_id,
@@ -143,7 +167,7 @@ class MissionService:
 
     def update_status_unit(db: Session):
         MissionService.update_status_mission(db)
-        
+
         current_date = date.today()
 
         # ดึง units ที่ไม่พร้อมใช้งาน

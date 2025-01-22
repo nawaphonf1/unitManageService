@@ -526,7 +526,6 @@ document.getElementById("confirmEdit").addEventListener("click", () => {
         mission_unit_id: missionUnits
     };
 
-    console.log(missionUnits);
 
     // ตรวจสอบ token
     if (!token) {
@@ -562,3 +561,185 @@ document.getElementById("confirmEdit").addEventListener("click", () => {
 
 
 // ---------------------------------------------------------------------------
+
+
+// -------------------------------------------Add-----------------------------
+document.getElementById("addMissionBtn").addEventListener("click", () => {
+    addUnitFromEditModel();
+
+});
+async function addUnitFromEditModel(position_id = '', first_name = '', last_name = '') {
+    try {
+        const queryParams = new URLSearchParams();
+        if (position_id) {
+            queryParams.append("position_id", position_id);
+        }
+        if (first_name) {
+            queryParams.append("first_name", first_name);
+        }
+        if (last_name) {
+            queryParams.append("last_name", last_name);
+        }
+        
+        const response = await fetch(`/api/unit/units_ready?${queryParams.toString()}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // Attach the token in the Authorization header
+            }
+        });
+
+        if (response.status === 401) {
+            alert("Session expired. Redirecting to the homepage.");
+            window.location.href = "/"; // Replace '/' with your homepage URL
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch unit details.");
+        }
+
+        const data = await response.json();
+        const tableBody = document.getElementById("addUnitFromAddModelTableBody");
+
+        tableBody.innerHTML = ""; // Clear existing rows
+        let indexss = 1;
+
+        // Populate the table with select boxes
+        data.forEach((unit, index) => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>
+                    <input type="checkbox" data-unit-id="${unit.units_id}">
+                </td>
+                <td>${unit.position_name_short || "N/A"}</td>
+                <td>${unit.first_name}</td>
+                <td>${unit.last_name}</td>
+            `;
+            tableBody.appendChild(row);
+            indexss += 1;
+        });
+
+        positionDropdown();
+    } catch (error) {
+        console.error("Error fetching addUnitFromAddModelTableBody:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
+    }
+
+    
+    
+}
+document.getElementById("confirmAddUnitAdd").addEventListener("click", () => {
+    const selectedUnits = [];
+    const checkboxes = document.querySelectorAll('#addUnitFromAddModelTableBody input[type="checkbox"]:checked');
+
+    checkboxes.forEach((checkbox) => {
+        const unitId = checkbox.getAttribute("data-unit-id");
+        const row = checkbox.closest("tr");
+        const position = row.children[1].innerText;
+        const firstName = row.children[2].innerText;
+        const lastName = row.children[3].innerText;
+
+        selectedUnits.push({ unitId, position, firstName, lastName });
+    });
+
+    const tableBody = document.getElementById("missionUnitAddTableBody");
+
+    // ดึง unitId ทั้งหมดที่มีอยู่แล้วใน tableBody
+    const existingUnitIds = Array.from(tableBody.querySelectorAll("button[data-edit-mission-unit-id]"))
+        .map(button => button.getAttribute("data-edit-mission-unit-id"));
+
+    selectedUnits.forEach((unit) => {
+        // ตรวจสอบว่า unitId มีอยู่ใน tableBody หรือยัง
+        if (!existingUnitIds.includes(unit.unitId)) {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${tableBody.children.length + 1}</td>
+                <td>${unit.position}</td>
+                <td>${unit.firstName}</td>
+                <td>${unit.lastName}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" data-edit-mission-unit-id="${unit.unitId}" onclick="deleteRow(this)">-</button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        }
+    });
+
+    // Close the modal
+    document.querySelector("#addUnitFromAddModel .btn-close").click();
+});
+document.getElementById("addMissionNewUnits").addEventListener("click", () => {
+    const tableBody = document.getElementById("missionUnitAddTableBody");
+    const rows = tableBody.querySelectorAll("tr"); // ดึงทุกแถวในตาราง
+    const missionUnits = [];
+
+    rows.forEach((row) => {
+        const unitId = row.querySelector("button")?.getAttribute("data-edit-mission-unit-id") || ""; // ดึง unit_id จาก attribute ปุ่ม (ถ้ามี)
+        if (unitId) {
+            missionUnits.push(parseInt(unitId)); // แปลงค่าของ unitId ให้เป็นตัวเลข
+        }
+    });
+
+    const missionAddName = document.getElementById("missionAddName").value;
+    const missionAddDateStart = document.getElementById("missionAddDateStart").value; // รูปแบบที่ถูกต้องคือ 'YYYY-MM-DD'
+    const missionAddDateEnd = document.getElementById("missionAddDateEnd").value; // รูปแบบที่ถูกต้องคือ 'YYYY-MM-DD'
+    const missionDetailAdd = document.getElementById("missionDetailAdd").value;
+    const missiontypeAdd = document.getElementById("missiontypeAdd").value;
+    const missionStatusAdd = "ready";
+
+    // ตรวจสอบข้อมูลก่อนส่ง
+    if (!missionAddName || !missionAddDateStart || !missionAddDateEnd || missionUnits.length === 0) {
+        alert("กรุณากรอกข้อมูลให้ครบถ้วน!");
+        return;
+    }
+
+    const data = {
+        mission_name: missionAddName,
+        mission_start: missionAddDateStart,
+        mission_end: missionAddDateEnd,
+        mission_detail: missionDetailAdd,
+        mission_type: missiontypeAdd,
+        mission_status: missionStatusAdd,
+        is_active: true,
+        mission_unit_id: missionUnits
+    };
+
+    console.log(data)
+
+
+    // ตรวจสอบ token
+    if (!token) {
+        alert("กรุณาเข้าสู่ระบบใหม่");
+        return;
+    }
+
+    // ส่งข้อมูลไปยัง API
+    fetch(`/api/mission/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // แทนที่ด้วย token ของคุณ
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => {
+            if (response.ok) {
+                alert("อัปเดตข้อมูลสำเร็จ!");
+                location.reload();
+            } else {
+                return response.json().then(err => {
+                    console.error("Error response:", err);
+                    alert("เกิดข้อผิดพลาดในการอัปเดตข้อมูล!");
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error updating mission units:", error);
+            alert("เกิดข้อผิดพลาดในการส่งข้อมูล!");
+        });
+});
+// -------------------------------------------Add-----------------------------

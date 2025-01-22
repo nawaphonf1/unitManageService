@@ -18,6 +18,13 @@ from typing import List
 
 router = APIRouter()
 
+@router.post("/", response_model=None)
+def create_mission(data: UpdateMissionUnitParam, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_unit = MissionService.create_mission(db, data)
+    if db_unit is None:
+        raise HTTPException(status_code=404, detail="Unit not found")
+    MissionService.update_status_unit(db)
+    return db_unit
 
 @router.get("/units/{unit_id}", response_model=List[MissionUnits])
 def get_unit(unit_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
