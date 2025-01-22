@@ -54,4 +54,5 @@ def update_mission_units(mission_id:int, data:UpdateMissionUnitParam ,db: Sessio
     db_mission = MissionService.update_mission_units_service(db,mission_id, data)
     if db_mission is None:
         raise HTTPException(status_code=404, detail="Mission not found")
+    MissionService.update_status_unit(db)
     return db_mission

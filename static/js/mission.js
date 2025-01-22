@@ -526,9 +526,7 @@ document.getElementById("confirmEdit").addEventListener("click", () => {
         mission_unit_id: missionUnits
     };
 
-    console.log(confirmEdit);
-
-    console.log(data);
+    console.log(missionUnits);
 
     // ตรวจสอบ token
     if (!token) {
@@ -548,6 +546,7 @@ document.getElementById("confirmEdit").addEventListener("click", () => {
         .then(response => {
             if (response.ok) {
                 alert("อัปเดตข้อมูลสำเร็จ!");
+                location.reload();
             } else {
                 return response.json().then(err => {
                     console.error("Error response:", err);

@@ -28,17 +28,6 @@ class MissionService:
         return query
     
     def get_missions(db: Session, skip: int = 0, limit: int = 100):
-
-
-
-
-        MissionService.update_status_unit(db)
-
-
-
-
-
-
         query = db.query(
             Mission.mission_id,
             Mission.mission_name,
@@ -153,9 +142,11 @@ class MissionService:
 
 
     def update_status_unit(db: Session):
-        from datetime import date
+        MissionService.update_status_mission(db)
+        
         current_date = date.today()
 
+        # ดึง units ที่ไม่พร้อมใช้งาน
         units = db.query(Unit).\
             join(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
             join(Mission, Mission.mission_id == MissionUnit.mission_id).\
@@ -164,20 +155,29 @@ class MissionService:
                 Mission.mission_end >= current_date
             )).all()
 
-        unit_is_not_ready = [id.units_id for id in units]
+        # สร้างรายการ units_id ที่ไม่พร้อม
+        unit_is_not_ready = {unit.units_id for unit in units}
 
-        all_unit = db.query(Unit).filter(Unit.is_active == True).all()
-        # แปลงผลลัพธ์เป็น dictionary
-        print(current_date)
-        print(units)
-        for unit in all_unit:
-            if(unit.units_id in unit_is_not_ready):
-                update_unit =  db.query(Unit).filter(Unit.units_id == unit.units_id).first()
-                update_unit.status = "not ready"
-            else:
-                update_unit =  db.query(Unit).filter(Unit.units_id == unit.units_id).first()
-                update_unit.status = "ready"
+        # ดึง units ทั้งหมด
+        all_units = db.query(Unit).filter(Unit.is_active == True).all()
+        print(unit_is_not_ready)
+        # อัปเดตสถานะในหน่วยความจำ
+        for unit in all_units:
+            unit.status = "not ready" if unit.units_id in unit_is_not_ready else "ready"
 
-            db.commit()  # บันทึกการเปลี่ยนแปลงลงฐานข้อมูล
-            db.refresh(update_unit)
+        # บันทึกการเปลี่ยนแปลงครั้งเดียว
+        db.commit()
+
+        
+
+    def update_status_mission(db:Session):
+        current_date = date.today()
+        mission =  db.query(Mission).filter(Mission.is_active == True).all()
+        for mission in mission:
+            mission.mission_status = "r" if mission.mission_start <=  current_date and mission.mission_end >= current_date else "nr"
+        
+        db.commit()
+
+        
+
 
