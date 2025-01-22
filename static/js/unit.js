@@ -32,8 +32,6 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
         queryParams.append("skip", (page - 1) * rowsPerPage);
         queryParams.append("limit", rowsPerPage);
 
-        console.log(name);
-
         if (position) {
             queryParams.append("position_id", position);
         }
@@ -206,7 +204,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const data = await response.json();
-            console.log(data);
 
             // แสดงข้อมูลใน modal
             document.getElementById('units-img').src = data.img_path
@@ -261,7 +258,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const data = await response.json();
-            console.log(data);
 
             // โหลดข้อมูลตำแหน่งจาก API
             const positionResponse = await fetch(`/api/position`, {
@@ -375,7 +371,6 @@ document.getElementById("add-upload-image-btn").addEventListener("click", async 
 
         const result = await response.json();
 
-        console.log(result.imageUrl);
         alert("อัพโหลดรูปภาพสำเร็จ");
         unitsImg.src = result.imageUrl; // ตั้งค่ารูปภาพที่อัพโหลด
     } catch (error) {
@@ -409,7 +404,6 @@ document.getElementById("upload-image-btn").addEventListener("click", async () =
 
         const result = await response.json();
 
-        console.log(result.imageUrl);
         alert("อัพโหลดรูปภาพสำเร็จ");
         unitsImg.src = result.imageUrl; // ตั้งค่ารูปภาพที่อัพโหลด
     } catch (error) {
@@ -452,7 +446,6 @@ document.getElementById("save-edit-units").addEventListener("click", async () =>
         address_detail: addressEdit
     };
 
-    console.log(payload);
 
     fetch(`/api/unit/${unitsId}`, {
         method: "PUT",

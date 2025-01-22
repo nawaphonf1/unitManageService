@@ -16,7 +16,7 @@ class Mission(Base):
     mission_start = Column(Date, nullable=False)
     mission_end = Column(Date, nullable=False)
     mission_detail = Column(Text, nullable=True)
-    mission_type = Column(Integer, nullable=False)
+    mission_type = Column(Text, nullable=False)
     mission_status = Column(CHAR, nullable=False)  # CHAR type for mission_status
     created_at = Column(Time(timezone=True), nullable=False, server_default=func.now())  # Default to now()
     is_active = Column(Boolean, nullable=False, default=True)  # Default to true

@@ -9,7 +9,7 @@ from ...models.unit import Unit
 
 from app.services.mission_service import MissionService
 
-from app.schemas.mission import MissionCreate, MissionOut, MissionUpdate, MissionUnits, MissionResponse
+from app.schemas.mission import MissionCreate, MissionOut, MissionUpdate, UpdateMissionUnitParam,MissionUnits, MissionResponse, UnitMissionResponse
 from app.auth.dependencies import get_current_user
 from app.auth.models import User
 from app.database import get_db
@@ -36,6 +36,22 @@ def get_missions(skip: int = 0,limit: int = 100, db: Session = Depends(get_db), 
 @router.get("/{mission_id}", response_model=MissionOut)
 def get_mission(mission_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_mission = MissionService.get_mission_by_id(db, mission_id=mission_id)
+    if db_mission is None:
+        raise HTTPException(status_code=404, detail="Mission not found")
+    return db_mission
+
+#get unit by mission_id
+@router.get("/mission_units/{mission_id}", response_model=List[UnitMissionResponse])
+def get_unit_by_mission_id(mission_id:int,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_mission = MissionService.get_unit_by_mission_id(db, mission_id=mission_id)
+    if db_mission is None:
+        raise HTTPException(status_code=404, detail="Mission not found")
+    return db_mission
+
+#update_mission_units
+@router.post("/update_mission_units/{mission_id}", response_model=None)
+def update_mission_units(mission_id:int, data:UpdateMissionUnitParam ,db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_mission = MissionService.update_mission_units_service(db,mission_id, data)
     if db_mission is None:
         raise HTTPException(status_code=404, detail="Mission not found")
     return db_mission

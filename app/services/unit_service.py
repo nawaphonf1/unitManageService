@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func,and_
 
 from app.models.unit import Unit
 from app.models.position import Position
@@ -118,4 +118,31 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
         "skip": skip,
         "limit": limit,
     }
+
+def get_units_active(db, position_id, first_name,last_name):
+    unit = db.query(
+            Unit.units_id,
+            Unit.first_name,
+            Unit.last_name,
+            Position.position_id,
+            Position.position_name,
+            Position.position_name_short
+        ).filter(
+            and_(
+                Unit.status == 'ready',
+                Unit.is_active == True
+            )
+        ).\
+        join(Position, Position.position_id == Unit.position_id)
+        
+    if first_name:
+        unit = unit.filter(Unit.first_name.contains(first_name))
+    if position_id:
+        unit = unit.filter(Unit.position_id == position_id)
+    if last_name:
+        unit = unit.filter(Unit.last_name.contains(last_name))
+
+    unit.all()
+
+    return unit
 
