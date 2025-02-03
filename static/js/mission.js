@@ -91,6 +91,8 @@ async function fetchAndDisplayMission(page = 1, position = '', dept = '', status
                 <td>
                     <button class="btn btn-info btn-sm" data-id="${mission.mission_id}" onclick="showMissionDetail(${mission.mission_id})">รายละเอียด</button>
                     <button class="btn btn-warning btn-sm" data-id="${mission.mission_id}" onclick="showMissionEdit(${mission.mission_id})">แก้ไข</button>
+                    <button class="btn btn-danger btn-sm" data-id="${mission.mission_id}" onclick="delMission(${mission.mission_id})">ลบ</button>
+
 
                 </td>
             `;
@@ -102,6 +104,38 @@ async function fetchAndDisplayMission(page = 1, position = '', dept = '', status
         // updatePagination(totalPages, page);
     } catch (error) {
         console.error("Error fetching units:", error);
+    }
+}
+
+async function delMission(missionId){
+    try {
+        const response = await fetch(`/api/mission/${missionId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // Attach the token in the Authorization header
+            }
+        });
+
+        if (response.status === 401) {
+            alert("Session expired. Redirecting to the homepage.");
+            window.location.href = "/"; // Replace '/' with your homepage URL
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch unit details.");
+        }
+
+        if (response.ok) {
+            alert("ลบภารกิจเสร็จสิน");
+            location.reload(); // Replace '/' with your homepage URL
+            return;
+        }
+
+    } catch (error) {
+        console.error("Error fetching showMissionUnitTableBody:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
     }
 }
 

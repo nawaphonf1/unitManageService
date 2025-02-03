@@ -565,7 +565,7 @@ document.getElementById("save-add-units").addEventListener("click", async () => 
         const bloodGroupAdd = document.getElementById("bloodGroupAdd").value;
         const addressAdd = document.getElementById("addressAdd").value;
 
-        const unitsImg = document.getElementById("units-img-add");
+        const unitsImg = document.getElementById("add-units-img");
         const imgPath = unitsImg.src && unitsImg.style.display !== "none" ? unitsImg.src : null;
 
         const payload = {
@@ -715,3 +715,33 @@ document.getElementById("submit-filter-units").addEventListener("click", async (
         alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
     }
 });
+
+document.getElementById("import-excel").addEventListener("click", async () => {
+    const importExcelModal = new bootstrap.Modal(document.getElementById("importExcelModal"));
+    importExcelModal.show();
+});
+
+document.getElementById("import-file-excel").addEventListener("click", async () => {
+    const fileInput = document.getElementById("file-excel");
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    const deptResponse = await fetch(`/api/mission/import_excel`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        },
+        body: formData
+    });
+
+    if (!deptResponse.ok) {
+        throw new Error("Failed to fetch departments.");
+    }
+
+    if (deptResponse.ok) {
+        location.reload();
+        alert('import ข้อมูลเสร็จสิ้น')
+    }
+
+});
+
