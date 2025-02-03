@@ -165,11 +165,6 @@ def get_units_active(db, position_id, first_name,last_name):
     return unit
 
 
-import requests
-from io import BytesIO
-from PIL import Image as PILImage
-from openpyxl.drawing.image import Image as openpyxl_Image
-
 def export_units(db):
     data = db.query(
                 Unit.img_path,
@@ -187,12 +182,13 @@ def export_units(db):
             join(Dept, Dept.dept_id == Unit.dept_id).\
             all()
             
+
     orders_list = []
     index = 1
     for item in data:
         orders_list.append({
             "ลำดับ": index,
-            "รูปภาพ": item.img_path,
+            "รูปภาพ":item.img_path,
             "ยศ": item.position_name_short,
             "ชื่อ": item.first_name,
             "นามสกุล": item.last_name,
@@ -212,6 +208,7 @@ def export_units(db):
     excel_file = BytesIO()
 
     with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
+
         df.to_excel(writer, index=False, sheet_name="รายงาน")
         workbook = writer.book
         worksheet = writer.sheets["รายงาน"]
@@ -227,7 +224,7 @@ def export_units(db):
                 except:
                     pass
             worksheet.column_dimensions[col_letter].width = max_length + 2
-
+        
         # กำหนด Style
         header_font = Font(bold=True, color="FFFFFF")
         header_fill = PatternFill(fill_type="solid", fgColor="4F81BD")
@@ -246,34 +243,7 @@ def export_units(db):
             cell.border = border_style
             cell.alignment = alignment
 
-        # แทรกรูปภาพในคอลัมน์ "รูปภาพ"
-        for i, item in enumerate(data, start=2):  # เริ่มที่แถวที่ 2 (แถวข้อมูล)
-            print(item)
-            img_path = item.img_path
-            if img_path:  # เช็คว่ามี path ของภาพ
-                try:
-                    # ดาวน์โหลดภาพจาก URL
-                    response = requests.get(img_path)
-                    if response.status_code == 200:
-                        img = PILImage.open(BytesIO(response.content))
-                        img = img.resize((40, 40))  # ปรับขนาดรูปภาพเป็น 40x40 พิกเซล
-
-                        # แปลงรูปภาพให้เป็น Image ของ openpyxl
-                        img_io = BytesIO()
-                        img.save(img_io, format="PNG")
-                        img_io.seek(0)
-
-                        img_openpyxl = openpyxl_Image(img_io)
-                        img_openpyxl.width = 40
-                        img_openpyxl.height = 40
-
-                        # แทรกภาพลงในเซลล์ที่ต้องการ (คอลัมน์ "รูปภาพ")
-                        worksheet.add_image(img_openpyxl, f'A{i}')  # แทรกในคอลัมน์ "A" ที่แถว i
-                    else:
-                        print(f"Failed to download image from {img_path}")
-                except Exception as e:
-                    print(f"Error loading image {img_path}: {e}")
-    # รีเซ็ต pointer และส่งไฟล์
+    # รีเซ็ต pointer และส่งไฟล์ 
     excel_file.seek(0)
     return excel_file
 
