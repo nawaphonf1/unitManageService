@@ -50,6 +50,7 @@
             <div class="d-flex justify-content-end mb-3">
                 <button type="button" id="addUnitBtn" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#unitAddModal">+ กำลังพล</button>
                 <button type="button" id="filter-units" class="btn btn-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">ตัวกรอง</button>
+                <button type="button" id="import-excel" class="btn btn-primary btn-sm ms-2" >Import Excel</button>
             </div>
 
             <table class="table table-bordered table-striped">
@@ -387,6 +388,38 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ยกเลิก</button>
                         <button type="button" class="btn btn-warning text-white" id="save-edit-units">บันทึก</button>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Import ข้อมูลจาก Excel -->
+        <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importExcelModalLabel">Import ข้อมูลจาก Excel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="input-group mb-3">
+                                        <input type="file" class="form-control" id="file-excel">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="button" class="btn btn-success text-white" id="import-file-excel">import</button>
 
                     </div>
                 </div>

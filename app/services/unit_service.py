@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func,and_
-
+from sqlalchemy import desc
 from app.models.unit import Unit
 from app.models.position import Position
 from app.models.dept import Dept
@@ -58,9 +58,10 @@ def get_unit(db: Session, unit_id: int):
         Unit.identify_soldier_id,
         Position.position_name,
         Dept.dept_name,
-    ).join(Position, Unit.position_id == Position.position_id) \
-     .join(Dept, Unit.dept_id == Dept.dept_id) \
+    ).outerjoin(Position, Unit.position_id == Position.position_id) \
+     .outerjoin(Dept, Unit.dept_id == Dept.dept_id) \
      .filter(Unit.units_id == unit_id) \
+     .order_by(desc(Position.position_seq))\
      .first()
 
     if query:
@@ -99,8 +100,9 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
             Position.position_name,
             Dept.dept_name,
         )
-        .join(Position, Unit.position_id == Position.position_id)
-        .join(Dept, Unit.dept_id == Dept.dept_id)
+        .outerjoin(Position, Unit.position_id == Position.position_id)
+        .outerjoin(Dept, Unit.dept_id == Dept.dept_id)
+        
     )
 
     # Apply filters
@@ -117,7 +119,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
     total = query.with_entities(func.count()).scalar()
 
     # Apply pagination
-    units = query.offset(skip).limit(limit).all()
+    units = query.order_by(desc(Position.position_seq)).offset(skip).limit(limit).all()
 
     # Format the response
     return {

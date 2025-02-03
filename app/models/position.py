@@ -14,3 +14,4 @@ class Position(Base):
     )
     position_name = Column(String(100), nullable=False)
     position_name_short = Column(String(100), nullable=False)
+    position_seq = Column(Integer, nullable=False)
