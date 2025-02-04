@@ -17,6 +17,10 @@ from datetime import date
 from io import BytesIO
 import pandas as pd
 
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
+from openpyxl.utils import get_column_letter
+
 class MissionService:
     def del_mission(db, mission_id):
         print(mission_id)
@@ -301,7 +305,117 @@ class MissionService:
         except Exception as e:
             return {"error": str(e)}
 
+    
 
+    def export_mission(db, mission_id):
+        mission_data = db.query(
+                    Mission.mission_id,
+                    Mission.mission_name,
+                    Mission.mission_start,
+                    Mission.mission_end,
+                    Mission.mission_status,
+                    Mission.mission_detail
+                ).filter(Mission.mission_id == mission_id).first()
         
+        mission_unit_data = db.query(
+                    MissionUnit.mission_id,
+                    Unit.units_id,
+                    Unit.first_name,
+                    Unit.last_name,
+                    Position.position_name,
+                    Position.position_name_short,
+                    Position.position_seq,
+                    Dept.dept_name_short,
+                    Unit.identify_id,
+        ).\
+        join(Unit,Unit.units_id == MissionUnit.unit_id).\
+        join(Position, Position.position_id == Unit.position_id).\
+        join(Dept, Dept.dept_id == Unit.dept_id).\
+        filter(MissionUnit.mission_id == mission_id).\
+        order_by(desc(Position.position_seq)).\
+        all()
+
+        # สร้าง DataFrame สำหรับตารางข้อมูล
+        orders_list = []
+        for index, item in enumerate(mission_unit_data, start=1):
+            orders_list.append({
+                "ลำดับ": index,
+                "ยศ": item.position_name_short,
+                "ชื่อ": item.first_name,
+                "นามสกุล": item.last_name,
+                "สังกัด": item.dept_name_short
+            })
+        df = pd.DataFrame(orders_list)
+
+        # สร้างไฟล์ Excel
+        excel_file = BytesIO()
+        with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, startrow=4, sheet_name="รายงาน")  # ข้อมูลเริ่มที่แถวที่ 5
+            workbook = writer.book
+            worksheet = writer.sheets["รายงาน"]
+
+            # เพิ่ม Header Mission
+            worksheet["A1"] = "ชื่อภารกิจ:"
+            worksheet["B1"] = mission_data.mission_name
+            worksheet["A2"] = "วันที่เริ่มต้น:"
+            worksheet["B2"] = MissionService.convert_to_thai_date(mission_data.mission_start)
+            worksheet["C2"] = "วันที่สิ้นสุด:"
+            worksheet["D2"] = MissionService.convert_to_thai_date(mission_data.mission_end)
+            worksheet["A3"] = "รายละเอียดภารกิจ:"
+            worksheet["B3"] = mission_data.mission_detail
+            worksheet["A4"] = "สถานะ:"
+            worksheet["B4"] = "กำลังดำเนินการ" if mission_data.mission_status == "r" else "สิ้นสุดแล้ว"
+
+            # Merge Cell สำหรับหัวข้อ Mission
+            worksheet.merge_cells("B1:D1")
+            worksheet.merge_cells("B3:D3")
+
+            # ปรับความกว้างของคอลัมน์
+            for col in worksheet.columns:
+                max_length = 0
+                col_letter = get_column_letter(col[0].column)
+                for cell in col:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                worksheet.column_dimensions[col_letter].width = max_length + 2
+
+            # กำหนด Style สำหรับ Header
+            header_font = Font(bold=True, color="FFFFFF")
+            header_fill = PatternFill(fill_type="solid", fgColor="4F81BD")
+            border_style = Border(
+                left=Side(border_style="thin"),
+                right=Side(border_style="thin"),
+                top=Side(border_style="thin"),
+                bottom=Side(border_style="thin"),
+            )
+            alignment = Alignment(horizontal="center", vertical="center")
+
+            # จัดการหัวตาราง
+            for cell in worksheet[5]:
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.border = border_style
+                cell.alignment = alignment
+
+            # ปรับ Style สำหรับข้อมูลในตาราง
+            for row in worksheet.iter_rows(min_row=6, max_row=worksheet.max_row, min_col=1, max_col=5):
+                for cell in row:
+                    cell.border = border_style
+                    cell.alignment = Alignment(horizontal="center", vertical="center")
+
+        # ส่งไฟล์ Excel
+        excel_file.seek(0)
+        return excel_file
+
+    def convert_to_thai_date(date):
+        months_thai = [
+            "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", 
+            "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", 
+            "พฤศจิกายน", "ธันวาคม"
+        ]
+        # แปลงเดือนและปี
+        month_thai = months_thai[date.month - 1]
+        year_thai = date.year + 543  # แปลงปี ค.ศ. เป็น พ.ศ.
+        return f"{date.day} {month_thai} {year_thai}"
 
 

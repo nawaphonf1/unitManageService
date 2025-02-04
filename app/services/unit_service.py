@@ -191,7 +191,6 @@ def export_units(db):
     for item in data:
         orders_list.append({
             "ลำดับ": index,
-            "รูปภาพ":item.img_path,
             "ยศ": item.position_name_short,
             "ชื่อ": item.first_name,
             "นามสกุล": item.last_name,

@@ -16,6 +16,8 @@ from app.database import get_db
 from typing import Optional
 from typing import List
 
+from fastapi.responses import StreamingResponse
+
 router = APIRouter()
 
 @router.post("/", response_model=None)
@@ -74,3 +76,12 @@ async def import_excel(db: Session = Depends(get_db),current_user: User = Depend
     db_mission = await MissionService.import_excel(db,file)
     return db_mission
     
+@router.get("/export_mission/{mission_id}")
+async def export_mission(mission_id: int,db: Session = Depends(get_db)):
+    excel_file = MissionService.export_mission(db,mission_id)
+
+    return StreamingResponse(
+        excel_file,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=unitExport.xlsx"}
+    )
