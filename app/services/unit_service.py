@@ -96,6 +96,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
             Unit.units_id,
             Unit.first_name,
             Unit.last_name,
+            Unit.img_path,
             Unit.status,
             Position.position_name,
             Dept.dept_name,
@@ -131,6 +132,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
                 "last_name": unit.last_name,
                 "position_name": unit.position_name,
                 "status": unit.status,
+                "img_path": unit.img_path,
             }
             for unit in units
         ],

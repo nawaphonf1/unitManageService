@@ -62,6 +62,7 @@ class Unittable(BaseModel):
     last_name: str
     position_name: str
     status: str
+    img_path: Optional[str]
 
 class UnitResponse(BaseModel):
     units: list[Unittable]

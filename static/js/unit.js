@@ -75,7 +75,11 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
             const statusColor = unit.status === "ready" ? "green" : "red";
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>${(page - 1) * rowsPerPage + index + 1}</td>
+                <td>${(page - 1) * rowsPerPage + index + 1}
+                <td>
+                    <img id="" src="${unit.img_path || "N/A"}" class="rounded mx-auto d-block mb-3" alt="units Image" style="max-width: 80px; max-height: 80px;">
+                </td>
+
                 <td>${unit.position_name || "N/A"}</td>
                 <td>${unit.first_name} ${unit.last_name}</td>
                 <td>${unit.dept_name || "N/A"}</td>
