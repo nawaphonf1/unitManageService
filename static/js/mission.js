@@ -599,10 +599,73 @@ document.getElementById("confirmEdit").addEventListener("click", () => {
 
 // -------------------------------------------Add-----------------------------
 document.getElementById("addMissionBtn").addEventListener("click", () => {
-    addUnitFromEditModel();
+    addUnitFromAddModel();
 
 });
 async function addUnitFromEditModel(position_id = '', first_name = '', last_name = '') {
+    try {
+        const queryParams = new URLSearchParams();
+        if (position_id) {
+            queryParams.append("position_id", position_id);
+        }
+        if (first_name) {
+            queryParams.append("first_name", first_name);
+        }
+        if (last_name) {
+            queryParams.append("last_name", last_name);
+        }
+        
+        const response = await fetch(`/api/unit/units_ready?${queryParams.toString()}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // Attach the token in the Authorization header
+            }
+        });
+
+        if (response.status === 401) {
+            alert("Session expired. Redirecting to the homepage.");
+            window.location.href = "/"; // Replace '/' with your homepage URL
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch unit details.");
+        }
+
+        const data = await response.json();
+        const tableBody = document.getElementById("addUnitFromEditModelTableBody");
+
+        tableBody.innerHTML = ""; // Clear existing rows
+        let indexss = 1;
+
+        // Populate the table with select boxes
+        data.forEach((unit, index) => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>
+                    <input type="checkbox" data-unit-id="${unit.units_id}">
+                </td>
+                <td>${unit.position_name_short || "N/A"}</td>
+                <td>${unit.first_name}</td>
+                <td>${unit.last_name}</td>
+            `;
+            tableBody.appendChild(row);
+            indexss += 1;
+        });
+
+        positionDropdown();
+    } catch (error) {
+        console.error("Error fetching addUnitFromAddModelTableBody:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลสมาชิก");
+    }
+
+    
+    
+}
+
+async function addUnitFromAddModel(position_id = '', first_name = '', last_name = '') {
     try {
         const queryParams = new URLSearchParams();
         if (position_id) {

@@ -432,50 +432,45 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-2">
-                            <a class="" data-bs-toggle="collapse" href="#collapseFilter" role="button"
-                                aria-expanded="false" aria-controls="collapseFilter">
-                                ค้นหา :
-                            </a>
-
-                            <div class="collapse ms-3 me-3 " id="collapseFilter">
-                                <div class="row mb-2">
-                                    <div class="col-12">
-                                        <label for="filterPositionAddUnitModel">ยศ</label>
-                                        <select class="form-select" id="filterPositionAddUnitModel">
-                                            <option selected></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="filterfirstNameAddUnitModel">ชื่อ</label>
-                                        <input type="text" id="filterfirstNameAddUnitModel" class="form-control">
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="filterLastNameAddUnitModel">นามสกุล</label>
-                                        <input type="text" id="filterLastNameAddUnitModel" class="form-control">
-                                    </div>
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <label for="filterPositionAddUnitModel">ยศ</label>
+                                    <select class="form-select" id="filterPositionAddUnitModel">
+                                        <option selected></option>
+                                    </select>
                                 </div>
-                                <div class="row">
-                                    <button type="button" class="btn btn-primary"
-                                        id="submitFilterAddUnitModel">ค้นหา</button>
+                                <div class="col-6">
+                                    <label for="filterfirstNameAddUnitModel">ชื่อ</label>
+                                    <input type="text" id="filterfirstNameAddUnitModel" class="form-control">
                                 </div>
+                                <div class="col-6">
+                                    <label for="filterLastNameAddUnitModel">นามสกุล</label>
+                                    <input type="text" id="filterLastNameAddUnitModel" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <button type="button" class="btn btn-primary"
+                                    id="submitFilterAddUnitModel">ค้นหา</button>
                             </div>
                         </div>
 
 
-                        <table class="table text-center">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">ยศ</th>
-                                    <th scope="col">ชื่อ</th>
-                                    <th scope="col">นามสกุล</th>
-                                </tr>
-                            </thead>
-                            <tbody id="addUnitFromEditModelTableBody">
-                                <!-- Rows will be dynamically inserted here -->
-
-                            </tbody>
-                        </table>
+                        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd;">
+                            <table class="table text-center">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">ยศ</th>
+                                        <th scope="col">ชื่อ</th>
+                                        <th scope="col">นามสกุล</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="addUnitFromEditModelTableBody">
+                                    <!-- Rows will be dynamically inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-danger" data-bs-target="#missionEditModal" data-bs-toggle="modal"
@@ -499,50 +494,45 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-2">
-                            <a class="" data-bs-toggle="collapse" href="#collapseFilter" role="button"
-                                aria-expanded="false" aria-controls="collapseFilter">
-                                ค้นหา :
-                            </a>
-
-                            <div class="collapse ms-3 me-3 " id="collapseFilter">
-                                <div class="row mb-2">
-                                    <div class="col-12">
-                                        <label for="filterPositionAddUnitModelAdd">ยศ</label>
-                                        <select class="form-select" id="filterPositionAddUnitModelAdd">
-                                            <option selected></option>
-                                        </select>
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="filterfirstNameAddUnitModelAdd">ชื่อ</label>
-                                        <input type="text" id="filterfirstNameAddUnitModelAdd" class="form-control">
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="filterLastNameAddUnitModelAdd">นามสกุล</label>
-                                        <input type="text" id="filterLastNameAddUnitModelAdd" class="form-control">
-                                    </div>
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <label for="filterPositionAddUnitModelAdd">ยศ</label>
+                                    <select class="form-select" id="filterPositionAddUnitModelAdd">
+                                        <option selected></option>
+                                    </select>
                                 </div>
-                                <div class="row">
-                                    <button type="button" class="btn btn-primary"
-                                        id="submitFilterAddUnitModelAdd">ค้นหา</button>
+                                <div class="col-6">
+                                    <label for="filterfirstNameAddUnitModelAdd">ชื่อ</label>
+                                    <input type="text" id="filterfirstNameAddUnitModelAdd" class="form-control">
                                 </div>
+                                <div class="col-6">
+                                    <label for="filterLastNameAddUnitModelAdd">นามสกุล</label>
+                                    <input type="text" id="filterLastNameAddUnitModelAdd" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <button type="button" class="btn btn-primary"
+                                    id="submitFilterAddUnitModelAdd">ค้นหา</button>
                             </div>
                         </div>
 
-
-                        <table class="table text-center">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">ยศ</th>
-                                    <th scope="col">ชื่อ</th>
-                                    <th scope="col">นามสกุล</th>
-                                </tr>
-                            </thead>
-                            <tbody id="addUnitFromAddModelTableBody">
-                                <!-- Rows will be dynamically inserted here -->
-
-                            </tbody>
-                        </table>
+                        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd;">
+                            <table class="table text-center">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">ยศ</th>
+                                        <th scope="col">ชื่อ</th>
+                                        <th scope="col">นามสกุล</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="addUnitFromAddModelTableBody">
+                                    <!-- Rows will be dynamically inserted here -->
+    
+                                </tbody>
+                            </table>
+                        </div>
+                        
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-danger" data-bs-target="#missionAddModal" data-bs-toggle="modal"
