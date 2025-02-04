@@ -55,6 +55,7 @@ class UnitMissionResponse(BaseModel):
     position_id: int
     position_name:str
     position_name_short:str
+    position_seq:int
 
 class UpdateMissionUnitParam(MissionBase):
     mission_unit_id: List[int]  # ใช้ List[int] แทน list เพื่อกำหนดประเภทข้อมูล

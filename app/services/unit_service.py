@@ -146,14 +146,15 @@ def get_units_active(db, position_id, first_name,last_name):
             Unit.last_name,
             Position.position_id,
             Position.position_name,
-            Position.position_name_short
+            Position.position_name_short,
+            Position.position_seq,
         ).filter(
             and_(
                 Unit.status == 'ready',
                 Unit.is_active == True
             )
         ).\
-        join(Position, Position.position_id == Unit.position_id)
+        join(Position, Position.position_id == Unit.position_id).order_by(desc(Position.position_seq))
         
     if first_name:
         unit = unit.filter(Unit.first_name.contains(first_name))

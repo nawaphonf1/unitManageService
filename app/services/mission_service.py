@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, class_mapper
 from sqlalchemy.sql import func, and_
+from sqlalchemy import desc
 
 from app.models.unit import Unit
 from app.models.position import Position
@@ -144,11 +145,13 @@ class MissionService:
                     Unit.last_name,
                     Position.position_id,
                     Position.position_name,
-                    Position.position_name_short
+                    Position.position_name_short,
+                    Position.position_seq,
                 ).\
                 join(Unit,Unit.units_id == MissionUnit.unit_id).\
                 join(Position, Position.position_id == Unit.position_id).\
                 filter(MissionUnit.mission_id ==mission_id).\
+                order_by(desc(Position.position_seq)).\
                 all()
         
         return query
