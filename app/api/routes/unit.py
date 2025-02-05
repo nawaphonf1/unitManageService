@@ -3,6 +3,7 @@ from pathlib import Path
 import shutil
 from typing import List
 from fastapi.responses import StreamingResponse
+from datetime import date
 
 from sqlalchemy.orm import Session
 from ...database import SessionLocal
@@ -65,8 +66,8 @@ def update_unit(unit_id: int, unit: UnitUpdate, db: Session = Depends(get_db), c
 
 #get units active
 @router.get("/units_ready", response_model=List[UnitMissionResponse])
-def get_units_active(position_id:Optional[int] = None,first_name:Optional[str] = None,last_name:Optional[str] = None,  db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    db_unit = unit_service.get_units_active(db, position_id, first_name,last_name)
+def get_units_active(position_id:Optional[int] = None,first_name:Optional[str] = None,last_name:Optional[str] = None,date_start:Optional[date] = None,date_end:Optional[date] = None,  db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_unit = unit_service.get_units_active(db, position_id, first_name,last_name, date_start, date_end)
     if db_unit is None:
         raise HTTPException(status_code=404, detail="Unit not found")
     return db_unit

@@ -1,9 +1,12 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import func,and_
+from sqlalchemy.sql import func,and_, or_
 from sqlalchemy import desc
 from app.models.unit import Unit
 from app.models.position import Position
 from app.models.dept import Dept
+from app.models.mission import Mission
+from app.models.mission_unit import MissionUnit
+
 
 from app.schemas.unit import UnitCreate, UnitAll, UnitResponse, UnitUpdate
 
@@ -21,9 +24,6 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 from io import BytesIO
-
-from sqlalchemy import and_, func
-
 
 def create_unit(db: Session, unit: UnitCreate):
     db_unit = Unit(**unit.dict())
@@ -141,7 +141,20 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
         "limit": limit,
     }
 
-def get_units_active(db, position_id, first_name,last_name):
+def get_units_active(db, position_id, first_name,last_name, date_start, date_end):
+    mission = db.query(
+            Mission.mission_id,
+            MissionUnit.unit_id
+        ).join(MissionUnit, MissionUnit.mission_id == Mission.mission_id).\
+        filter(
+            or_(
+                Mission.mission_end < date_start,  # Mission สิ้นสุดก่อนช่วง date_start
+                Mission.mission_start > date_end  # Mission เริ่มหลังช่วง date_end
+            )
+        ).all()
+    
+    unit_id_list = [unit.unit_id for unit in mission]
+
     unit = db.query(
             Unit.units_id,
             Unit.first_name,
@@ -151,9 +164,12 @@ def get_units_active(db, position_id, first_name,last_name):
             Position.position_name_short,
             Position.position_seq,
         ).filter(
-            and_(
+            or_(
+                and_(
                 Unit.status == 'ready',
                 Unit.is_active == True
+                ),
+                Unit.units_id.in_(unit_id_list)
             )
         ).\
         join(Position, Position.position_id == Unit.position_id).order_by(desc(Position.position_seq))

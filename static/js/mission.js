@@ -600,9 +600,19 @@ document.getElementById("confirmEdit").addEventListener("click", () => {
 
 
 // -------------------------------------------Add-----------------------------
-document.getElementById("addMissionBtn").addEventListener("click", () => {
-    addUnitFromAddModel();
+document.getElementById("addUnitFromAddModel2").addEventListener("click", (event) => {
+    const date_start = document.getElementById("missionAddDateStart").value;
+    const date_end = document.getElementById("missionAddDateEnd").value;
 
+    if (date_start === '' || date_end === '') {
+        alert("กรุณากรอกวันที่เริ่มและสิ้นสุดภารกิจ");
+
+        // หยุดการทำงานของ event เพื่อไม่ให้เปิด modal
+        event.preventDefault();
+    } else {
+        // แสดงข้อมูลเพิ่มเติมใน modal
+        showDataAddUnitFromAddModel();
+    }
 });
 async function addUnitFromEditModel(position_id = '', first_name = '', last_name = '') {
     try {
@@ -616,6 +626,12 @@ async function addUnitFromEditModel(position_id = '', first_name = '', last_name
         if (last_name) {
             queryParams.append("last_name", last_name);
         }
+
+        date_start = document.getElementById("missionEditDateStart").value;
+        date_end = document.getElementById("missionEditDateEnd").value;
+
+        queryParams.append("date_start", date_start);
+        queryParams.append("date_end", date_end);
         
         const response = await fetch(`/api/unit/units_ready?${queryParams.toString()}`, {
             method: "GET",
@@ -667,7 +683,7 @@ async function addUnitFromEditModel(position_id = '', first_name = '', last_name
     
 }
 
-async function addUnitFromAddModel(position_id = '', first_name = '', last_name = '') {
+async function showDataAddUnitFromAddModel(position_id = '', first_name = '', last_name = '') {
     try {
         const queryParams = new URLSearchParams();
         if (position_id) {
@@ -679,6 +695,13 @@ async function addUnitFromAddModel(position_id = '', first_name = '', last_name 
         if (last_name) {
             queryParams.append("last_name", last_name);
         }
+        
+
+        date_start = document.getElementById("missionAddDateStart").value;
+        date_end = document.getElementById("missionAddDateEnd").value;
+
+        queryParams.append("date_start", date_start);
+        queryParams.append("date_end", date_end);
         
         const response = await fetch(`/api/unit/units_ready?${queryParams.toString()}`, {
             method: "GET",
