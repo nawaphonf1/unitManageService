@@ -99,6 +99,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
             Unit.img_path,
             Unit.status,
             Position.position_name,
+            Position.position_seq,
             Dept.dept_name,
         )
         .outerjoin(Position, Unit.position_id == Position.position_id)
@@ -116,31 +117,38 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
         if status == 'ready':
             query = query.join(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
             join(Mission, Mission.mission_id == MissionUnit.mission_id).\
+            filter(MissionUnit.mission_id == Mission.mission_id).\
             filter(Mission.mission_end < datetime.datetime.now())
         elif status == 'not ready':
             query = query.join(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
             join(Mission, Mission.mission_id == MissionUnit.mission_id).\
+            filter(MissionUnit.mission_id == Mission.mission_id).\
             filter(Mission.mission_start <= datetime.datetime.now()).\
             filter(Mission.mission_end >= datetime.datetime.now())
         elif status == 'wait':
             query = query.join(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
             join(Mission, Mission.mission_id == MissionUnit.mission_id).\
+            filter(MissionUnit.mission_id == Mission.mission_id).\
             filter(Mission.mission_start > datetime.datetime.now())
         
-        query = query.group_by(
-            Unit.units_id,
-            Unit.first_name,
-            Unit.last_name,
-            Unit.img_path,
-            Unit.status,
-            Position.position_name,
-            Dept.dept_name)
 
     # Get total count for pagination
+    # total = db.query(func.count(Unit.units_id)).scalar()
     total = query.with_entities(func.count()).scalar()
 
+    if status:
+        query = query.group_by(
+                Unit.units_id,
+                Unit.first_name,
+                Unit.last_name,
+                Unit.img_path,
+                Unit.status,
+                Position.position_name,
+                Position.position_seq,
+                Dept.dept_name)
     # Apply pagination
     units = query.order_by(desc(Position.position_seq)).offset(skip).limit(limit).all()
+    print(total)
 
     data = []
     for unit in units:
@@ -151,9 +159,12 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
             Mission.mission_name,
             Mission.mission_start,
             Mission.mission_end,
-        ).join(Mission, Mission.mission_id == MissionUnit.mission_id).\
-        filter(MissionUnit.unit_id == unit.units_id).\
-        order_by(Mission.mission_start).first()
+        ).join(Mission, Mission.mission_id == MissionUnit.mission_id)\
+        .filter(MissionUnit.unit_id == unit.units_id)\
+        .order_by(Mission.mission_start)\
+        .first()
+
+
 
         status = None
         date_start = None
