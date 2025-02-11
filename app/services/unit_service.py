@@ -118,7 +118,10 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
             query = query.join(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
             join(Mission, Mission.mission_id == MissionUnit.mission_id).\
             filter(MissionUnit.mission_id == Mission.mission_id).\
-            filter(Mission.mission_end < datetime.datetime.now())
+            filter(and_(
+                Mission.mission_end < datetime.datetime.now(),
+                Mission.mission_start < datetime.datetime.now(),
+            ))
         elif status == 'not ready':
             query = query.join(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
             join(Mission, Mission.mission_id == MissionUnit.mission_id).\
@@ -137,6 +140,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
     total = query.with_entities(func.count()).scalar()
 
     if status:
+        units = query.order_by(desc(Mission.mission_start),desc(Position.position_seq)).offset(skip).limit(limit).all()
         query = query.group_by(
                 Unit.units_id,
                 Unit.first_name,
@@ -146,13 +150,14 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
                 Position.position_name,
                 Position.position_seq,
                 Dept.dept_name)
-    # Apply pagination
-    units = query.order_by(desc(Position.position_seq)).offset(skip).limit(limit).all()
+    else:
+
+        # Apply pagination
+        units = query.order_by(desc(Position.position_seq)).offset(skip).limit(limit).all()
     print(total)
 
     data = []
     for unit in units:
-        print(unit)
         mission = db.query(
             MissionUnit.mission_id,
             MissionUnit.unit_id,
@@ -161,7 +166,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
             Mission.mission_end,
         ).join(Mission, Mission.mission_id == MissionUnit.mission_id)\
         .filter(MissionUnit.unit_id == unit.units_id)\
-        .order_by(Mission.mission_start)\
+        .order_by(desc(Mission.mission_start))\
         .first()
 
 
@@ -169,7 +174,10 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
         status = None
         date_start = None
         date_end= None
+        if unit.units_id ==  1037:
+            print(unit)
 
+            print(mission)
         if mission:
             if isinstance(mission.mission_start, datetime.date):
                 mission_start = datetime.datetime.combine(mission.mission_start, datetime.time.min)
@@ -182,6 +190,9 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
                 mission_end = mission.mission_end
 
             now = datetime.datetime.now()
+            if unit.units_id ==  1037:
+                print(mission_start)
+                print(mission_end)
 
             if mission_start > now:
                 status = "รอเริ่มภารกิจ"
@@ -194,6 +205,10 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
         else:
             status = "ว่าง"
 
+        if unit.units_id ==  1037:
+                print(status)
+                print(date_start)
+                print(date_end)
 
         data.append({
             "units_id": unit.units_id,
