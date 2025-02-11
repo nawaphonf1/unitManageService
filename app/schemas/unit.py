@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-
+from datetime import date
 class UnitBase(BaseModel):
     first_name: str
     last_name: str
@@ -63,6 +63,9 @@ class Unittable(BaseModel):
     position_name: str
     status: str
     img_path: Optional[str]
+    date_start: Optional[date] = None
+    date_end: Optional[date] = None
+
 
 class UnitResponse(BaseModel):
     units: list[Unittable]

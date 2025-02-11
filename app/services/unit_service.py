@@ -103,7 +103,6 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
         )
         .outerjoin(Position, Unit.position_id == Position.position_id)
         .outerjoin(Dept, Unit.dept_id == Dept.dept_id)
-        
     )
 
     # Apply filters
@@ -114,7 +113,28 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
     if dept_id:
         query = query.filter(Unit.dept_id == dept_id)
     if status:
-        query = query.filter(Unit.status == status)
+        if status == 'ready':
+            query = query.join(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
+            join(Mission, Mission.mission_id == MissionUnit.mission_id).\
+            filter(Mission.mission_end < datetime.datetime.now())
+        elif status == 'not ready':
+            query = query.join(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
+            join(Mission, Mission.mission_id == MissionUnit.mission_id).\
+            filter(Mission.mission_start <= datetime.datetime.now()).\
+            filter(Mission.mission_end >= datetime.datetime.now())
+        elif status == 'wait':
+            query = query.join(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
+            join(Mission, Mission.mission_id == MissionUnit.mission_id).\
+            filter(Mission.mission_start > datetime.datetime.now())
+        
+        query = query.group_by(
+            Unit.units_id,
+            Unit.first_name,
+            Unit.last_name,
+            Unit.img_path,
+            Unit.status,
+            Position.position_name,
+            Dept.dept_name)
 
     # Get total count for pagination
     total = query.with_entities(func.count()).scalar()
@@ -122,20 +142,63 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
     # Apply pagination
     units = query.order_by(desc(Position.position_seq)).offset(skip).limit(limit).all()
 
+    data = []
+    for unit in units:
+        print(unit)
+        mission = db.query(
+            MissionUnit.mission_id,
+            MissionUnit.unit_id,
+            Mission.mission_name,
+            Mission.mission_start,
+            Mission.mission_end,
+        ).join(Mission, Mission.mission_id == MissionUnit.mission_id).\
+        filter(MissionUnit.unit_id == unit.units_id).\
+        order_by(Mission.mission_start).first()
+
+        status = None
+        date_start = None
+        date_end= None
+
+        if mission:
+            if isinstance(mission.mission_start, datetime.date):
+                mission_start = datetime.datetime.combine(mission.mission_start, datetime.time.min)
+            else:
+                mission_start = mission.mission_start
+
+            if isinstance(mission.mission_end, datetime.date):
+                mission_end = datetime.datetime.combine(mission.mission_end, datetime.time.max)
+            else:
+                mission_end = mission.mission_end
+
+            now = datetime.datetime.now()
+
+            if mission_start > now:
+                status = "รอเริ่มภารกิจ"
+                date_start = mission.mission_start
+                date_end = mission.mission_end
+            elif mission_end < now:
+                status = "ว่าง"
+            else:
+                status = "อยู่ในภารกิจ"
+        else:
+            status = "ว่าง"
+
+
+        data.append({
+            "units_id": unit.units_id,
+            "first_name": unit.first_name,
+            "last_name": unit.last_name,
+            "position_name": unit.position_name,
+            "dept_name": unit.dept_name,
+            "status": status,
+            "date_start": date_start,
+            "date_end": date_end,
+            "img_path": unit.img_path,
+        })
+
     # Format the response
     return {
-        "units": [
-            {
-                "units_id": unit.units_id,
-                "dept_name": unit.dept_name,
-                "first_name": unit.first_name,
-                "last_name": unit.last_name,
-                "position_name": unit.position_name,
-                "status": unit.status,
-                "img_path": unit.img_path,
-            }
-            for unit in units
-        ],
+        "units": data,
         "total": total,
         "skip": skip,
         "limit": limit,

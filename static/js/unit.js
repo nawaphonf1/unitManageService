@@ -72,7 +72,20 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
 
         // Populate the table
         data.units.forEach((unit, index) => {
-            const statusColor = unit.status === "ready" ? "green" : "red";
+            let statusColor;
+            let status;
+
+            if(unit.status === "อยู่ในภารกิจ"){
+                statusColor = "red";
+                status = "อยู่ในภารกิจ"
+            }else if(unit.status === "รอเริ่มภารกิจ"){
+                statusColor = "yellow";
+                status = "รอเริ่มภารกิจ" + "(" + formatDateToThai(unit.date_start) +" - "+formatDateToThai(unit.date_end) +  ")";
+            }else if(unit.status === "ว่าง"){
+                statusColor = "green";
+                status = "ว่าง";
+            }
+
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${(page - 1) * rowsPerPage + index + 1}
@@ -84,7 +97,7 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
                 <td>${unit.first_name} ${unit.last_name}</td>
                 <td>${unit.dept_name || "N/A"}</td>
                 <td>
-                    <span class="status-circle" style="background-color: ${statusColor};"></span> ${unit.status || "Active"}
+                    <span class="status-circle" style="background-color: ${statusColor};"></span> ${status || "Active"}
                 </td>
                 <td>
                     <button class="btn btn-info btn-sm" data-id="${unit.units_id}" onclick="showMemberDetail(${unit.units_id})">รายละเอียด</button>
@@ -101,7 +114,13 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
         console.error("Error fetching units:", error);
     }
 }
-
+function formatDateToThai(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate(); // วันที่
+    const month = date.toLocaleString("th-TH", { month: "long" }); // ชื่อเดือนแบบไทย
+    const year = date.getFullYear() + 543; // แปลง ค.ศ. เป็น พ.ศ.
+    return `${day} ${month} ${year}`;
+}
 
 async function displayUnitsMission(unitId) {
     try {
@@ -130,7 +149,17 @@ async function displayUnitsMission(unitId) {
 
         let num = 1; // เริ่มต้นตัวแปร num
         data.forEach((mission) => {
-            const statusColor = mission.mission_status === "r" ? "green" : "red";
+            let statusColor = null;
+            if (mission.mission_status == 'r') {
+                statusColor = "green";
+            }
+            else if (mission.mission_status == 'w') {
+                statusColor = "yellow";
+            }
+            else
+            {
+                statusColor = "red";
+            }
 
             // แปลงวันที่เริ่มต้นและสิ้นสุดเป็นแบบไทย
             const missionStartDate = formatDateToThai(mission.mission_start);
