@@ -91,28 +91,34 @@
                                     <div class="row">
                                         <div class="col-12 mb-3">
                                             <div>
-                                                <label for="filterPosition">ยศ</label>
-                                                <select class="form-select" id="filterPosition">
-                                                    <option selected></option>
-                                                </select>
+                                                <label for="filterMissionName">ชื่อภารกิจ</label>
+                                                <input type="text" class="form-control" id="filterMissionName">
                                             </div>
                                             <div>
-                                                <label for="filterName">ชื่อ</label>
-                                                <input type="text" class="form-control" id="filterName">
+                                                <label for="filterDateStart">วันที่เริ่มต้น</label>
+                                                <input type="date" class="form-control" id="filterDateStart">
+
                                             </div>
                                             <div>
-                                                <label for="filterDept">สังกัด</label>
-                                                <select class="form-select" id="filterDept">
-                                                    <option selected></option>
-                                                </select>
+                                                <label for="filterDateEnd">วันที่สิ้นสุด</label>
+                                                <input type="date" class="form-control" id="filterDateEnd">
+
                                             </div>
 
+                                            <div>
+                                                <label for="filterMissionType">ประเภทภารกิจ</label>
+                                                <input type="text" class="form-control" id="filterMissionType">
+
+                                            </div>
+                                            
                                             <div>
                                                 <label for="filterStatus">สถานะ</label>
                                                 <select class="form-select" id="filterStatus">
                                                     <option selected></option>
-                                                    <option value="ready">ว่าง</option>
-                                                    <option value="not ready">ไม่ว่าง</option>
+                                                    <option value="r">กำลังดำเนินการ</option>
+                                                    <option value="w">รอดำเนินการ</option>
+                                                    <option value="n">สิ้นสุด</option>
+
                                                 </select>
                                             </div>
 
@@ -126,7 +132,7 @@
                     </div>
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-success text-white"
-                            id="submit-filter-units">กรองข้อมูล</button>
+                            id="submit-filter-mission">กรองข้อมูล</button>
                     </div>
                 </div>
             </div>

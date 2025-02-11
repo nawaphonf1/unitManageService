@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException,  File, UploadFile
 from pathlib import Path
+from datetime import date
 import shutil
 
 from sqlalchemy.orm import Session
@@ -37,8 +38,17 @@ def get_unit(unit_id: int, db: Session = Depends(get_db), current_user: User = D
 
 #get all missions
 @router.get("/", response_model=MissionResponse)
-def get_missions(skip: int = 0,limit: int = 100, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    db_missions = MissionService.get_missions(db, skip, limit)
+def get_missions(
+        skip: int = 0,
+        limit: int = 100, 
+        mission_name: Optional[str] = None,
+        mission_start: Optional[date] = None,
+        mission_end: Optional[date] = None,
+        mission_type: Optional[str] = None,
+        mission_status: Optional[str] = None,
+        db: Session = Depends(get_db), 
+        current_user: User = Depends(get_current_user)):
+    db_missions = MissionService.get_missions(db, skip, limit, mission_name, mission_start, mission_end, mission_type, mission_status)
     return db_missions 
 
 #get mission by id

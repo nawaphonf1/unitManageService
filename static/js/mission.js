@@ -25,27 +25,30 @@ let currentPage = 1;
 const rowsPerPage = 10;
 
 // Function to fetch and display units
-async function fetchAndDisplayMission(page = 1, position = '', dept = '', status = '',name = '') {
+async function fetchAndDisplayMission(page = 1, mission_name = "", mission_start= "", mission_end= "", mission_type= "", mission_status= "") {
     try {
         // สร้าง query string เฉพาะพารามิเตอร์ที่มีค่า
         const queryParams = new URLSearchParams();
-        // queryParams.append("skip", (page - 1) * rowsPerPage);
-        // queryParams.append("limit", rowsPerPage);
+        queryParams.append("skip", (page - 1) * rowsPerPage);
+        queryParams.append("limit", rowsPerPage);
 
         // console.log(name);
 
-        // if (position) {
-        //     queryParams.append("position_id", position);
-        // }
-        // if (dept) {
-        //     queryParams.append("dept_id", dept);
-        // }
-        // if (status) {
-        //     queryParams.append("status", status);
-        // }
-        // if (name) {
-        //     queryParams.append("name", name);
-        // }
+        if (mission_name) {
+            queryParams.append("mission_name", mission_name);
+        }
+        if (mission_start) {
+            queryParams.append("mission_start", mission_start);
+        }
+        if (mission_end) {
+            queryParams.append("mission_end", mission_end);
+        }
+        if (mission_type) {
+            queryParams.append("mission_type", mission_type);
+        }
+        if (mission_status) {
+            queryParams.append("mission_status", mission_status);
+        }
 
         // ส่งคำขอไปที่ API พร้อม query string
         const response = await fetch(`${apiUrl}?${queryParams.toString()}`, {
@@ -74,7 +77,17 @@ async function fetchAndDisplayMission(page = 1, position = '', dept = '', status
 
         // Populate the table
         data.missions.forEach((mission, index) => {
-            const statusColor = mission.mission_status === "r" ? "green" : "red";
+            let statusColor = null;
+            if (mission.mission_status == 'r') {
+                statusColor = "green";
+            }
+            else if (mission.mission_status == 'w') {
+                statusColor = "yellow";
+            }
+            else
+            {
+                statusColor = "red";
+            }
             const row = document.createElement("tr");
             const missionStartDate = formatDateToThai(mission.mission_start);
             const missionEndDate = formatDateToThai(mission.mission_end);
@@ -101,11 +114,49 @@ async function fetchAndDisplayMission(page = 1, position = '', dept = '', status
 
         // Update pagination
         const totalPages = Math.ceil(data.total / rowsPerPage);
-        // updatePagination(totalPages, page);
+        updatePagination(totalPages, page);
     } catch (error) {
         console.error("Error fetching units:", error);
     }
 }
+function updatePagination(totalPages, currentPage) {
+    const pagination = document.getElementById("pagination");
+    pagination.innerHTML = ""; // Clear existing pagination
+
+    const mission_name = document.getElementById("filterMissionName").value;
+    const mission_start = document.getElementById("filterDateStart").value;
+    const mission_end = document.getElementById("filterDateEnd").value;
+    const mission_type = document.getElementById("filterMissionType").value;
+    const mission_status = document.getElementById("filterStatus").value;
+
+
+    for (let page = 1; page <= totalPages; page++) {
+        const li = document.createElement("li");
+        li.className = `page-item ${page === currentPage ? "active" : ""}`;
+        li.innerHTML = `
+            <a class="page-link" href="#">${page}</a>
+        `;
+        li.addEventListener("click", (event) => {
+            event.preventDefault();
+            fetchAndDisplayMission(page, mission_name, mission_start, mission_end, mission_type, mission_status);
+        });
+        pagination.appendChild(li);
+    }
+}
+
+document.getElementById("submit-filter-mission").addEventListener("click", () => {
+    const mission_name = document.getElementById("filterMissionName").value;
+    const mission_start = document.getElementById("filterDateStart").value;
+    const mission_end = document.getElementById("filterDateEnd").value;
+    const mission_type = document.getElementById("filterMissionType").value;
+    const mission_status = document.getElementById("filterStatus").value;
+
+
+    fetchAndDisplayMission(1, mission_name, mission_start, mission_end, mission_type, mission_status);
+
+    const filterModal = bootstrap.Modal.getInstance(document.getElementById("filterModal"));
+    filterModal.hide();
+});
 
 async function delMission(missionId){
     try {
@@ -221,9 +272,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const missionEndDate = formatDateToThai(data.mission_end);
             let missionStatus = data.mission_status;
             if (data.mission_status == 'r') {
-            missionStatus = "กำลังดำเนินการ";
-            } else {
-            missionStatus = "ดำเนินการเสร็จสิ้น";
+                missionStatus = "กำลังดำเนินการ";
+            } else if(data.mission_status == 'w'){
+                missionStatus = "รอดำเนินการ";
+
+            }
+            else {
+                missionStatus = "ดำเนินการเสร็จสิ้น";
             }
             // แสดงข้อมูลใน modal
             document.getElementById('missionDetailName').value = data.mission_name || '';
@@ -282,9 +337,13 @@ async function showMissionEdit(missionId) {
         const missionEndDate = formatDateToThai(data.mission_end);
         let missionStatus = data.mission_status;
         if (data.mission_status == 'r') {
-        missionStatus = "กำลังดำเนินการ";
-        } else {
-        missionStatus = "ดำเนินการเสร็จสิ้น";
+            missionStatus = "กำลังดำเนินการ";
+        } else if(data.mission_status == 'w'){
+            missionStatus = "รอดำเนินการ";
+
+        }
+        else {
+            missionStatus = "ดำเนินการเสร็จสิ้น";
         }
         // แสดงข้อมูลใน modal
         document.getElementById('missionEditName').value = data.mission_name || '';

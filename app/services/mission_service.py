@@ -69,7 +69,7 @@ class MissionService:
 
         return query
     
-    def get_missions(db: Session, skip: int = 0, limit: int = 100):
+    def get_missions(db: Session, skip: int = 0, limit: int = 100, mission_name: str = None, mission_start: date = None, mission_end: date = None, mission_type: str = None, mission_status: str = None):
         query = db.query(
             Mission.mission_id,
             Mission.mission_name,
@@ -79,9 +79,18 @@ class MissionService:
             Mission.is_active,
             Mission.created_at,
             Mission.mission_type
-        ).filter(Mission.is_active == True).offset(skip).limit(limit)
+        ).filter(Mission.is_active == True)
         
-
+        if mission_name:
+            query = query.filter(Mission.mission_name.contains(mission_name))
+        if mission_start:
+            query = query.filter(Mission.mission_start == mission_start)
+        if mission_end:
+            query = query.filter(Mission.mission_end == mission_end)
+        if mission_type:
+            query = query.filter(Mission.mission_type == mission_type)
+        if mission_status:
+            query = query.filter(Mission.mission_status == mission_status)
         # Get total count for pagination
         total = query.with_entities(func.count()).scalar()
 
@@ -223,7 +232,12 @@ class MissionService:
         current_date = date.today()
         mission =  db.query(Mission).filter(Mission.is_active == True).all()
         for mission in mission:
-            mission.mission_status = "r" if mission.mission_start <=  current_date and mission.mission_end >= current_date else "nr"
+            if mission.mission_start <=  current_date and mission.mission_end >= current_date:
+                mission.mission_status = "r" 
+            elif mission.mission_start > current_date:
+                mission.mission_status = "w"
+            else:
+                "nr"
         
         db.commit()
 

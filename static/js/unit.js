@@ -171,6 +171,10 @@ async function displayUnitsMission(unitId) {
 function updatePagination(totalPages, currentPage) {
     const pagination = document.getElementById("pagination");
     pagination.innerHTML = ""; // Clear existing pagination
+    const filterPosition = document.getElementById("filterPosition").value;
+    const filterDept = document.getElementById("filterDept").value;
+    const filterStatus = document.getElementById("filterStatus").value;
+    const filterName = document.getElementById("filterName").value;
 
     for (let page = 1; page <= totalPages; page++) {
         const li = document.createElement("li");
@@ -180,7 +184,7 @@ function updatePagination(totalPages, currentPage) {
         `;
         li.addEventListener("click", (event) => {
             event.preventDefault();
-            fetchAndDisplayUnits(page);
+            fetchAndDisplayUnits(page, filterPosition, filterDept, filterStatus, filterName);
         });
         pagination.appendChild(li);
     }
