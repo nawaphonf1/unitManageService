@@ -45,10 +45,10 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
             queryParams.append("name", name);
         }
         if (date_start) {
-            queryParams.append("date_start", date_start);
+            queryParams.append("start_date", date_start);
         }
         if (date_end) {
-            queryParams.append("date_end", date_end);
+            queryParams.append("end_date", date_end);
         }
 
         // ส่งคำขอไปที่ API พร้อม query string
@@ -210,6 +210,8 @@ function updatePagination(totalPages, currentPage) {
     const filterDept = document.getElementById("filterDept").value;
     const filterStatus = document.getElementById("filterStatus").value;
     const filterName = document.getElementById("filterName").value;
+    const filterDateStart = document.getElementById("filterDateStart").value;
+    const filterDateEnd = document.getElementById("filterDateEnd").value;
 
     for (let page = 1; page <= totalPages; page++) {
         const li = document.createElement("li");
@@ -219,7 +221,7 @@ function updatePagination(totalPages, currentPage) {
         `;
         li.addEventListener("click", (event) => {
             event.preventDefault();
-            fetchAndDisplayUnits(page, filterPosition, filterDept, filterStatus, filterName);
+            fetchAndDisplayUnits(page, filterPosition, filterDept, filterStatus, filterName, filterDateStart, filterDateEnd);
         });
         pagination.appendChild(li);
     }
