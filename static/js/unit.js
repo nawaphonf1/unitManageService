@@ -782,3 +782,43 @@ document.getElementById("import-file-excel").addEventListener("click", async () 
 
 });
 
+document.getElementById('export-excel').addEventListener('click', async () => {
+    try {
+        // เรียก API เพื่อดึงไฟล์ Excel
+        const response = await fetch(`/api/unit/export_units`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}` // ใช้ token ในการยืนยันตัวตน
+            }
+        });
+
+        if (response.status === 401) {
+            alert('Session expired. Please login again.');
+            window.location.href = '/login'; // Redirect ไปยังหน้า login หาก session หมดอายุ
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error('Failed to export mission data.');
+        }
+
+        // รับไฟล์จาก response
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // สร้างลิงก์สำหรับดาวน์โหลด
+        const link = document.createElement('a');
+        link.href = url;
+        // link.download = `${missionName}.xlsx`; // ตั้งชื่อไฟล์ที่ต้องการดาวน์โหลด
+        document.body.appendChild(link);
+        link.click();
+
+        // ลบลิงก์หลังจากดาวน์โหลดเสร็จ
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error('Error exporting mission:', error);
+        alert('เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์ Excel');
+    }
+});

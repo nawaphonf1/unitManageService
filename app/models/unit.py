@@ -28,3 +28,4 @@ class Unit(Base):
     is_active = Column(Boolean, nullable=False, default=True)
     img_path = Column(Text, nullable=True)
     identify_soldier_id = Column(Text, nullable=True)
+    position_detail = Column(Text, nullable=True)

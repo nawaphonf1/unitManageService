@@ -277,7 +277,6 @@ def get_units_active(db, position_id, first_name,last_name, date_start, date_end
 
 def export_units(db):
     data = db.query(
-                Unit.img_path,
                 Position.position_name_short,
                 Unit.first_name,
                 Unit.last_name,
@@ -286,10 +285,12 @@ def export_units(db):
                 Unit.identify_soldier_id,
                 Unit.tel,
                 Unit.blood_group_id,
-                Unit.address_detail
+                Unit.address_detail,
+                Unit.position_detail
             ).\
-            join(Position, Position.position_id == Unit.position_id).\
-            join(Dept, Dept.dept_id == Unit.dept_id).\
+            outerjoin(Position, Position.position_id == Unit.position_id).\
+            outerjoin(Dept, Dept.dept_id == Unit.dept_id).\
+            order_by(desc(Position.position_seq)).\
             all()
             
 
@@ -302,6 +303,7 @@ def export_units(db):
             "ชื่อ": item.first_name,
             "นามสกุล": item.last_name,
             "สังกัด": item.dept_name_short,
+            "ตำแหน่ง": item.position_detail,
             "หมายเลขประจำตัว": item.identify_id,
             "หมายเลขประจำตัวทหาร": item.identify_soldier_id,
             "เบอร์โทร": item.tel,
@@ -309,7 +311,7 @@ def export_units(db):
             "ที่อยู่": item.address_detail
         })
         index += 1
-
+    print(orders_list)
     # สร้าง DataFrame จากข้อมูล
     df = pd.DataFrame(orders_list)
 

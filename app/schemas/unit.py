@@ -18,6 +18,7 @@ class UnitBase(BaseModel):
     is_active: Optional[bool] = True  # เพิ่มฟิลด์ is_active และตั้งค่าเริ่มต้นเป็น True
     img_path: Optional[str] = None  # เพิ่มฟิลด์ img_path
     identify_soldier_id: Optional[str] = None  # เพิ่มฟิลด์ identify_soldier_id
+    position_detail: Optional[str] = None 
 
     class Config:
         orm_mode = True
@@ -47,6 +48,7 @@ class UnitUpdate(BaseModel):
     address_detail: Optional[str] = None
     img_path: Optional[str] = None  # เพิ่มฟิลด์ img_path
     identify_soldier_id: Optional[str] = None  # เพิ่มฟิลด์ identify_soldier_id
+    position_detail: Optional[str] = None
 
 class UnitAll(BaseModel):
     name: str
