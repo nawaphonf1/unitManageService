@@ -50,12 +50,14 @@ def get_all_units(
     position_id: Optional[int] = None,
     dept_id: Optional[int] = None,
     status: Optional[str] = None,
+    start_date: Optional[date] = None,
+    end_date: Optional[date] = None,
     skip: int = 0,
     limit: int = 100, 
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return unit_service.get_all_units(db, name, position_id, dept_id,status, skip, limit)
+    return unit_service.get_all_units(db, name, position_id, dept_id,status,start_date, end_date, skip, limit)
 
 @router.put("/{unit_id}", response_model=UnitBase)
 def update_unit(unit_id: int, unit: UnitUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

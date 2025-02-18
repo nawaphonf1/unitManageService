@@ -25,7 +25,7 @@ let currentPage = 1;
 const rowsPerPage = 10;
 
 // Function to fetch and display units
-async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status = '',name = '') {
+async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status = '',name = '', date_start = '', date_end = '') {
     try {
         // สร้าง query string เฉพาะพารามิเตอร์ที่มีค่า
         const queryParams = new URLSearchParams();
@@ -43,6 +43,12 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
         }
         if (name) {
             queryParams.append("name", name);
+        }
+        if (date_start) {
+            queryParams.append("date_start", date_start);
+        }
+        if (date_end) {
+            queryParams.append("date_end", date_end);
         }
 
         // ส่งคำขอไปที่ API พร้อม query string
@@ -246,12 +252,14 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('units-img').src = data.img_path
             // document.getElementById("modalPositionName").textContent = data.position_name;
             document.getElementById("unitDetailName").innerHTML = "<strong class='pe-3'>ชื่อ:</strong> " + "<br>" + data.position_name + " " + data.first_name + " " + data.last_name;
+            document.getElementById("positionDetail1").innerHTML = "<strong class='pe-3'>ตำแหน่ง:</strong> " + "<br>" + data.position_detail;
             document.getElementById("deptDetailName").innerHTML = "<strong class='pe-3'>สังกัด:</strong> " + "<br>" + data.dept_name;
             document.getElementById("identifyIdDetail").innerHTML = "<strong class='pe-3'>หมายเลขประจำตัว:</strong> " + "<br>" + data.identify_id;
             document.getElementById("identifySoldierIdDetail").innerHTML = "<strong class='pe-3'>หมายเลขประจำตัวทหาร:</strong> " + "<br>" + data.identify_soldier_id;
             document.getElementById("telDetail").innerHTML = "<strong class='pe-3'>เบอร์โทร:</strong> " + "<br>" + data.tel;
             document.getElementById("bloodGroupDetail").innerHTML = "<strong class='pe-3'>กรุ๊ปเลือด:</strong> " + "<br>" + data.blood_group_id;
             document.getElementById("addressDetail").innerHTML = "<strong class='pe-3'>ที่อยู่:</strong> " + "<br>" + data.address_detail;
+
 
 
 
@@ -357,6 +365,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             document.getElementById("unitEditFirstName").value = data.first_name;
             document.getElementById("unitEditLastName").value = data.last_name;
+            document.getElementById("positionDetailEdit").value = data.position_detail;
             document.getElementById("identifyIdEdit").value = data.identify_id;
             document.getElementById("identifySoldierIdEdit").value = data.identify_soldier_id;
             document.getElementById("telEdit").value = data.tel;
@@ -460,6 +469,8 @@ document.getElementById("save-edit-units").addEventListener("click", async () =>
     const telEdit = document.getElementById("telEdit").value;
     const bloodGroupEdit = document.getElementById("bloodGroupEdit").value;
     const addressEdit = document.getElementById("addressEdit").value;
+    const positionDetail = document.getElementById("positionDetailEdit").value;
+
 
     const unitsId = document.getElementById("save-edit-units").getAttribute("data-units-id");
 
@@ -480,7 +491,8 @@ document.getElementById("save-edit-units").addEventListener("click", async () =>
         identify_soldier_id: identifySoldierIdEdit,
         tel: telEdit,
         boold_group_id: bloodGroupEdit,
-        address_detail: addressEdit
+        address_detail: addressEdit,
+        position_detail: positionDetail
     };
 
 
@@ -739,10 +751,14 @@ document.getElementById("submit-filter-units").addEventListener("click", async (
         const filterDept = document.getElementById("filterDept").value;
         const filterStatus = document.getElementById("filterStatus").value;
         const filterName = document.getElementById("filterName").value;
+        const filterDateStart = document.getElementById("filterDateStart").value;
+        const filterDateEnd = document.getElementById("filterDateEnd").value;
+
+
 
 
         // เรียก fetchAndDisplayUnits พร้อมค่าฟิลเตอร์
-        await fetchAndDisplayUnits(1, filterPosition, filterDept, filterStatus, filterName);
+        await fetchAndDisplayUnits(1, filterPosition, filterDept, filterStatus, filterName, filterDateStart, filterDateEnd);
 
         // ดึง instance ของ modal ที่เปิดอยู่
         const filterModal = bootstrap.Modal.getInstance(document.getElementById("filterModal"));

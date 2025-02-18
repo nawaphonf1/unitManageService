@@ -46,7 +46,7 @@ class UnitUpdate(BaseModel):
     parish_id: Optional[int] = None
     post_code: Optional[int] = None
     address_detail: Optional[str] = None
-    img_path: Optional[str] = None  # เพิ่มฟิลด์ img_path
+    img_path: Optional[str]  # เพิ่มฟิลด์ img_path
     identify_soldier_id: Optional[str] = None  # เพิ่มฟิลด์ identify_soldier_id
     position_detail: Optional[str] = None
 

@@ -58,6 +58,7 @@ def get_unit(db: Session, unit_id: int):
         Unit.identify_soldier_id,
         Position.position_name,
         Dept.dept_name,
+        Unit.position_detail
     ).outerjoin(Position, Unit.position_id == Position.position_id) \
      .outerjoin(Dept, Unit.dept_id == Dept.dept_id) \
      .filter(Unit.units_id == unit_id) \
@@ -85,11 +86,12 @@ def get_unit(db: Session, unit_id: int):
             "dept_name": query.dept_name,
             "img_path": query.img_path,
             "identify_soldier_id": query.identify_soldier_id,
+            "position_detail": query.position_detail
         }
     return None
 
 
-def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=None, skip=0, limit=100):
+def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=None,start_date = None, end_date= None, skip=0, limit=100):
     # Base query with join
     query = (
         db.query(
@@ -134,7 +136,19 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
             filter(MissionUnit.mission_id == Mission.mission_id).\
             filter(Mission.mission_start > datetime.datetime.now())
         
-
+    if start_date and end_date:
+        mission = db.query(
+            Mission.mission_id,
+            MissionUnit.unit_id
+        ).join(MissionUnit, MissionUnit.mission_id == Mission.mission_id).filter(
+            or_(
+                and_(Mission.mission_start >= start_date, Mission.mission_start <= end_date),
+                and_(Mission.mission_end >= start_date, Mission.mission_end <= end_date),
+                and_(Mission.mission_start <= start_date, Mission.mission_end >= end_date)  # ครอบคลุมกรณี mission ครอบทั้งช่วง
+            )
+        ).all()
+        unit_id_list = [m.unit_id for m in mission]
+        query = query.filter(Unit.units_id.not_in(unit_id_list))
     # Get total count for pagination
     # total = db.query(func.count(Unit.units_id)).scalar()
     total = query.with_entities(func.count()).scalar()
@@ -154,7 +168,6 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
 
         # Apply pagination
         units = query.order_by(desc(Position.position_seq)).offset(skip).limit(limit).all()
-    print(total)
 
     data = []
     for unit in units:
@@ -174,10 +187,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
         status = None
         date_start = None
         date_end= None
-        if unit.units_id ==  1037:
-            print(unit)
 
-            print(mission)
         if mission:
             if isinstance(mission.mission_start, datetime.date):
                 mission_start = datetime.datetime.combine(mission.mission_start, datetime.time.min)
@@ -190,9 +200,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
                 mission_end = mission.mission_end
 
             now = datetime.datetime.now()
-            if unit.units_id ==  1037:
-                print(mission_start)
-                print(mission_end)
+
 
             if mission_start > now:
                 status = "รอเริ่มภารกิจ"
@@ -204,11 +212,6 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
                 status = "อยู่ในภารกิจ"
         else:
             status = "ว่าง"
-
-        if unit.units_id ==  1037:
-                print(status)
-                print(date_start)
-                print(date_end)
 
         data.append({
             "units_id": unit.units_id,
@@ -311,7 +314,6 @@ def export_units(db):
             "ที่อยู่": item.address_detail
         })
         index += 1
-    print(orders_list)
     # สร้าง DataFrame จากข้อมูล
     df = pd.DataFrame(orders_list)
 
