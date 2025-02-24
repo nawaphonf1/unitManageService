@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, class_mapper
-from sqlalchemy.sql import func, and_
+from sqlalchemy.sql import func, and_, or_
 from sqlalchemy import desc
 
 from app.models.unit import Unit
@@ -338,15 +338,16 @@ class MissionService:
                     Unit.units_id,
                     Unit.first_name,
                     Unit.last_name,
+                    Unit.position_detail,
                     Position.position_name,
                     Position.position_name_short,
                     Position.position_seq,
                     Dept.dept_name_short,
                     Unit.identify_id,
         ).\
-        join(Unit,Unit.units_id == MissionUnit.unit_id).\
-        join(Position, Position.position_id == Unit.position_id).\
-        join(Dept, Dept.dept_id == Unit.dept_id).\
+        outerjoin(Unit,Unit.units_id == MissionUnit.unit_id).\
+        outerjoin(Position, Position.position_id == Unit.position_id).\
+        outerjoin(Dept, Dept.dept_id == Unit.dept_id).\
         filter(MissionUnit.mission_id == mission_id).\
         order_by(desc(Position.position_seq)).\
         all()
@@ -359,7 +360,8 @@ class MissionService:
                 "ยศ": item.position_name_short,
                 "ชื่อ": item.first_name,
                 "นามสกุล": item.last_name,
-                "สังกัด": item.dept_name_short
+                "สังกัด": item.dept_name_short,
+                "ตำแหน่ง":item.position_detail
             })
         df = pd.DataFrame(orders_list)
 
@@ -421,7 +423,7 @@ class MissionService:
                 cell.alignment = alignment
 
             # ปรับ Style สำหรับข้อมูลในตาราง
-            for row in worksheet.iter_rows(min_row=6, max_row=worksheet.max_row, min_col=1, max_col=5):
+            for row in worksheet.iter_rows(min_row=6, max_row=worksheet.max_row, min_col=1, max_col=6):
                 for cell in row:
                     cell.border = border_style
                     cell.alignment = Alignment(horizontal="center", vertical="center")
@@ -441,4 +443,138 @@ class MissionService:
         year_thai = date.year + 543  # แปลงปี ค.ศ. เป็น พ.ศ.
         return f"{date.day} {month_thai} {year_thai}"
 
+    def export_mission_unit(db, mission_name, mission_start, mission_end, mission_type, mission_status, position_detail, position_name):
+        # ดึงข้อมูลภารกิจที่อยู่ในช่วงวันที่กำหนด
+        mission_data = db.query(
+            Mission.mission_id,
+            MissionUnit.unit_id,
+            Mission.mission_name,
+            Mission.mission_start,
+            Mission.mission_end
+        ).join(MissionUnit, Mission.mission_id == MissionUnit.mission_id)
 
+        if mission_start and mission_end:
+            mission_data = mission_data.filter(
+                and_(
+                    Mission.mission_start >= mission_start,
+                    Mission.mission_end <= mission_end
+                )
+            )
+        if mission_name:
+            query = query.filter(Mission.mission_name.contains(mission_name))
+        if mission_type:
+            query = query.filter(Mission.mission_type == mission_type)
+        if mission_status:
+            query = query.filter(Mission.mission_status == mission_status)
+
+        mission_data = mission_data.all()
+        # ดึงข้อมูลหน่วย
+        unit_data = db.query(
+            Unit.units_id,
+            Position.position_name_short,
+            Unit.first_name,
+            Unit.last_name,
+            Unit.position_detail
+        ).join(Position, Position.position_id == Unit.position_id).\
+        order_by(desc(Position.position_seq)).\
+        filter(Unit.is_active == True)
+
+        if position_detail:
+            unit_data = unit_data.filter(Unit.position_detail.contains(position_detail))
+        if position_name:
+            unit_data = unit_data.filter(or_(
+                Position.position_name.contains(position_name),
+                Position.position_name_short.contains(position_name)
+            ))
+
+        unit_data = unit_data.all()
+        # แปลงชื่อภารกิจให้มีวันที่แบบ พ.ศ.
+        mission_names = list(set(
+            f"{m.mission_name} ({MissionService.convert_to_thai_date(m.mission_start)} - {MissionService.convert_to_thai_date(m.mission_end)})"
+            for m in mission_data
+        ))
+
+        # สร้าง DataFrame
+        orders_list = []
+        for index, unit in enumerate(unit_data, start=1):
+            unit_missions = {mission_name: "" for mission_name in mission_names}  # ตั้งค่าเริ่มต้นเป็น ""
+
+            for mission in mission_data:
+                mission_full_name = f"{mission.mission_name} ({MissionService.convert_to_thai_date(mission.mission_start)} - {MissionService.convert_to_thai_date(mission.mission_end)})"
+                if mission.unit_id == unit.units_id:
+                    unit_missions[mission_full_name] = "/"  # ถ้าตรงกันให้เป็น "/"
+
+            # รวมข้อมูลหน่วยและภารกิจ
+            unit_entry = {
+                "ลำดับ": index,
+                "ยศ": unit.position_name_short,
+                "ชื่อ": unit.first_name,
+                "นามสกุล": unit.last_name,
+                "ตำแหน่ง": unit.position_detail,
+                **unit_missions  # รวมข้อมูลภารกิจเข้าไปใน dictionary
+            }
+            orders_list.append(unit_entry)
+
+        # แปลงเป็น DataFrame
+        df = pd.DataFrame(orders_list)
+
+        # สร้างไฟล์ Excel
+        excel_file = BytesIO()
+        with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, startrow=1, sheet_name="รายงาน")  # ข้อมูลเริ่มที่แถวที่ 5
+            workbook = writer.book
+            worksheet = writer.sheets["รายงาน"]
+
+            # ปรับความกว้างของคอลัมน์
+            for col in worksheet.columns:
+                max_length = 0
+                col_letter = get_column_letter(col[0].column)
+                for cell in col:
+                    if cell.value:
+                        max_length = max(max_length, len(str(cell.value)))
+                worksheet.column_dimensions[col_letter].width = max_length + 2
+
+            # กำหนด Style สำหรับ Header
+            header_font = Font(bold=True, color="FFFFFF")
+            header_fill = PatternFill(fill_type="solid", fgColor="4F81BD")
+            border_style = Border(
+                left=Side(border_style="thin"),
+                right=Side(border_style="thin"),
+                top=Side(border_style="thin"),
+                bottom=Side(border_style="thin"),
+            )
+            alignment = Alignment(horizontal="center", vertical="center")
+
+            # จัดการหัวตาราง
+            for cell in worksheet[2]:
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.border = border_style
+                cell.alignment = alignment
+
+            # **หมุนข้อความของ Header ตั้งแต่คอลัมน์ที่ F เป็นต้นไป**
+            for col_idx in range(6, worksheet.max_column + 1):  # เริ่มที่คอลัมน์ที่ 6 (F)
+                cell = worksheet.cell(row=2, column=col_idx)
+                cell.alignment = Alignment(textRotation=90, horizontal="center", vertical="center")
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.border = border_style
+
+            red_fill = PatternFill(fill_type="solid", fgColor="ffca2c")  # พื้นหลังสีแดง
+            white_font = Font(color="FFFFFF")  # ตัวอักษรสีขาว
+
+            # ปรับ Style สำหรับข้อมูลในตาราง
+            for row in worksheet.iter_rows(min_row=3, max_row=worksheet.max_row, min_col=1, max_col=worksheet.max_column):
+                for cell in row:
+                    if cell.value == "/":  # ถ้าเซลล์มี "/"
+                        cell.fill = red_fill  # เปลี่ยนพื้นหลังเป็นสีแดง
+                        # cell.font = white_font  # เปลี่ยนตัวอักษรเป็นสีขาว
+                    cell.border = border_style
+                    cell.alignment = Alignment(horizontal="center", vertical="center")
+
+            # worksheet.freeze_panes = "F6"
+            
+
+        # ส่งไฟล์ Excel
+        excel_file.seek(0)
+        return excel_file

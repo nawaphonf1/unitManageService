@@ -95,3 +95,22 @@ async def export_mission(mission_id: int,db: Session = Depends(get_db)):
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=unitExport.xlsx"}
     )
+
+@router.get("export_missions/unit")
+async def export_mission_unit( 
+        mission_name: Optional[str] = None,
+        mission_start: Optional[date] = None,
+        mission_end: Optional[date] = None,
+        mission_type: Optional[str] = None,
+        mission_status: Optional[str] = None,
+        position_detail: Optional[str] = None,
+        position_name: Optional[str] = None,
+        db: Session = Depends(get_db)):
+    excel_file = MissionService.export_mission_unit(db, mission_name, mission_start, mission_end, mission_type, mission_status, position_detail, position_name)
+
+    # return excel_file
+    return StreamingResponse(
+        excel_file,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=unitExport.xlsx"}
+    )

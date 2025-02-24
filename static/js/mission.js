@@ -969,3 +969,79 @@ document.getElementById('exportExcelMission').addEventListener('click', async ()
         alert('เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์ Excel');
     }
 });
+
+
+document.getElementById('submit-export-mission-unit').addEventListener('click', async () => {
+    try {
+
+        const queryParams = new URLSearchParams();
+        
+        const filterDateStart = document.getElementById("filterDateStart").value;
+        const filterDateEnd = document.getElementById("filterDateEnd").value;
+        const filterMissionType = document.getElementById("filterMissionType").value;
+        const filterStatus = document.getElementById("filterStatus").value;
+        const filterPositionDetail = document.getElementById("filterPositionDetail").value;
+        const filterPosition = document.getElementById("filterPosition").value;
+
+
+        // console.log(name);
+
+        if (filterDateStart != '') {
+            queryParams.append("mission_start", filterDateStart);
+        }
+        if (filterDateEnd != '') {
+            queryParams.append("mission_end", filterDateEnd);
+        }
+        if (filterMissionType != '') {
+            queryParams.append("mission_type", filterMissionType);
+        }
+        if (filterStatus != '') {
+            queryParams.append("mission_status", filterStatus);
+        }
+        if (filterPositionDetail != '') {
+            queryParams.append("position_detail", filterPositionDetail);
+        }
+        if (filterPosition != '') {
+            queryParams.append("position_name", filterPosition);
+        }
+
+
+
+        // เรียก API เพื่อดึงไฟล์ Excel
+        const response = await fetch(`/api/missionexport_missions/unit?${queryParams.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}` // ใช้ token ในการยืนยันตัวตน
+            }
+        });
+
+        if (response.status === 401) {
+            alert('Session expired. Please login again.');
+            window.location.href = '/login'; // Redirect ไปยังหน้า login หาก session หมดอายุ
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error('Failed to export mission data.');
+        }
+
+        // รับไฟล์จาก response
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        // สร้างลิงก์สำหรับดาวน์โหลด
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `รายงานภารกิจ.xlsx`; // ตั้งชื่อไฟล์ที่ต้องการดาวน์โหลด
+        document.body.appendChild(link);
+        link.click();
+
+        // ลบลิงก์หลังจากดาวน์โหลดเสร็จ
+        link.remove();
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error('Error exporting mission:', error);
+        alert('เกิดข้อผิดพลาดในการดาวน์โหลดไฟล์ Excel');
+    }
+});

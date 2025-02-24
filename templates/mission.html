@@ -52,6 +52,10 @@
             <div class="d-flex justify-content-end mb-3">
                 <button type="button" id="addMissionBtn" class="btn btn-success btn-sm" data-bs-toggle="modal"
                     data-bs-target="#missionAddModal">+ ภารกิจ</button>
+
+                <button type="button" class="btn btn-warning text-white btn-sm ms-2" data-bs-toggle="modal"
+                    data-bs-target="#exportMissionUnitModel">Export</button>
+
                 <button type="button" id="filter-units" class="btn btn-secondary btn-sm ms-2" data-bs-toggle="modal"
                     data-bs-target="#filterModal">ตัวกรอง</button>
             </div>
@@ -75,6 +79,76 @@
                 <ul class="pagination justify-content-center" id="pagination">
                 </ul>
             </nav>
+        </div>
+
+        <!-- exportMissionUnitModel -->
+        <div class="modal fade" id="exportMissionUnitModel" tabindex="-1" aria-labelledby="exportMissionUnitModelLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-center" id="exportMissionUnitModelLabel">กรองรายงาน</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <div>
+                                                <label for="filterDateStart">วันที่เริ่มต้น</label>
+                                                <input type="date" class="form-control" id="filterDateStart">
+
+                                            </div>
+                                            <div>
+                                                <label for="filterDateEnd">วันที่สิ้นสุด</label>
+                                                <input type="date" class="form-control" id="filterDateEnd">
+
+                                            </div>
+
+                                            <div>
+                                                <label for="filterMissionType">ประเภทภารกิจ</label>
+                                                <input type="text" class="form-control" id="filterMissionType">
+
+                                            </div>
+                                            
+                                            <div>
+                                                <label for="filterStatus">สถานะ</label>
+                                                <select class="form-select" id="filterStatus">
+                                                    <option selected></option>
+                                                    <option value="r">กำลังดำเนินการ</option>
+                                                    <option value="w">รอดำเนินการ</option>
+                                                    <option value="n">สิ้นสุด</option>
+
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label for="filterPositionDetail">ตำแหน่ง</label>
+                                                <input type="text" class="form-control" id="filterPositionDetail">
+
+                                            </div>
+
+                                            <div>
+                                                <label for="filterPosition">ยศ</label>
+                                                <input type="text" class="form-control" id="filterPosition">
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-success text-white"
+                            id="submit-export-mission-unit">ยืนยัน</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- filter -->
