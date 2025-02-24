@@ -25,6 +25,16 @@ from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 from io import BytesIO
 
+def delete_unit(db: Session, unit_id: int):
+    db.query(Unit).filter(Unit.units_id == unit_id).delete()
+
+    # delete mission_unit
+    db.query(MissionUnit).filter(MissionUnit.unit_id == unit_id).delete()
+
+    db.commit()
+
+    return {"message": "Delete success"}
+
 def create_unit(db: Session, unit: UnitCreate):
     db_unit = Unit(**unit.dict())
     db.add(db_unit)

@@ -108,6 +108,7 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
                 <td>
                     <button class="btn btn-info btn-sm" data-id="${unit.units_id}" onclick="showMemberDetail(${unit.units_id})">รายละเอียด</button>
                     <button class="btn btn-warning btn-sm" data-id="${unit.units_id}" onclick="showMemberEdit(${unit.units_id})">แก้ไข</button>
+                    <button class="btn btn-danger btn-sm" data-id="${unit.units_id}" onclick="delMember(${unit.units_id})">ลบ</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -387,9 +388,41 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    async function delMember(unitId){
+        try {
+            const response = await fetch(`${apiUrl}${unitId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // Attach the token in the Authorization header
+                }
+            });
+
+            if (response.status === 401) {
+                alert("Session expired. Redirecting to the homepage.");
+                window.location.href = "/"; // Replace '/' with your homepage URL
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch unit details.");
+            }else{
+                alert("ลบสำเร็จ");
+                location.reload();
+            }
+
+        } catch (error) {
+            console.error("Error fetching member details:", error);
+            alert("เกิดข้อผิดพลาดในการลบสมาชิก");
+        }
+
+    }
+
     fetchAndDisplayUnits(currentPage)
     window.showMemberDetail = showMemberDetail;
     window.showMemberEdit = showMemberEdit;
+    window.delMember = delMember;
+
 
 
     window.displayUnitsMission = displayUnitsMission; // ให้ฟังก์ชันใช้ได้ใน scope ทั่วไป

@@ -83,3 +83,10 @@ async def export_units(db: Session = Depends(get_db)):
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=unitExport.xlsx"}
     )
+
+@router.delete("/{unit_id}")
+def delete_unit(unit_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    db_unit = unit_service.delete_unit(db, unit_id)
+    if db_unit is None:
+        raise HTTPException(status_code=404, detail="Unit not found")
+    return {"message": "Unit deleted successfully"}
