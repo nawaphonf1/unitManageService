@@ -15,7 +15,7 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
         method: 'POST',
         body: formData,  // ส่ง formData
     })
-    .then(response => response.json())
+    .then(response => response.json()) 
     .then(data => {
         if (data.access_token) {
             // เก็บ token ใน cookie
