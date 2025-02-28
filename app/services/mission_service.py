@@ -461,11 +461,11 @@ class MissionService:
                 )
             )
         if mission_name:
-            query = query.filter(Mission.mission_name.contains(mission_name))
+            mission_data = mission_data.filter(Mission.mission_name.contains(mission_name))
         if mission_type:
-            query = query.filter(Mission.mission_type == mission_type)
+            mission_data = mission_data.filter(Mission.mission_type == mission_type)
         if mission_status:
-            query = query.filter(Mission.mission_status == mission_status)
+            mission_data = mission_data.filter(Mission.mission_status == mission_status)
 
         mission_data = mission_data.all()
         # ดึงข้อมูลหน่วย
