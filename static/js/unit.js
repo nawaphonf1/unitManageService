@@ -525,7 +525,7 @@ document.getElementById("save-edit-units").addEventListener("click", async () =>
         identify_id: identifyIdEdit,
         identify_soldier_id: identifySoldierIdEdit,
         tel: telEdit,
-        boold_group_id: bloodGroupEdit,
+        blood_group_id: bloodGroupEdit,
         address_detail: addressEdit,
         position_detail: positionDetail
     };

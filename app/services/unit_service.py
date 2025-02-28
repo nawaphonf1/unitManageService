@@ -43,6 +43,7 @@ def create_unit(db: Session, unit: UnitCreate):
     return db_unit
 
 def update_unit(db: Session, unit_id: int, unit: UnitUpdate):
+    print(unit)
     db.query(Unit).filter(Unit.units_id == unit_id).update(unit.dict())
     db.commit()
     return db.query(Unit).filter(Unit.units_id == unit_id).first()
@@ -246,16 +247,30 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
 def get_units_active(db, position_id, first_name,last_name, date_start, date_end):
     mission = db.query(
             Mission.mission_id,
-            MissionUnit.unit_id
-        ).join(MissionUnit, MissionUnit.mission_id == Mission.mission_id).\
-        filter(
-            or_(
-                Mission.mission_end < date_start,  # Mission สิ้นสุดก่อนช่วง date_start
-                Mission.mission_start > date_end  # Mission เริ่มหลังช่วง date_end
-            )
-        ).all()
+            Mission.mission_start,
+            Mission.mission_end,
+            MissionUnit.unit_id.label("mission_unit_id"),
+            Unit.units_id,
+        ).outerjoin(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
+        outerjoin(Mission, Mission.mission_id == MissionUnit.mission_id).all()
     
-    unit_id_list = [unit.unit_id for unit in mission]
+    # .\
+    #     filter(
+    #         or_(
+    #             Mission.mission_end < date_start,  # Mission สิ้นสุดก่อนช่วง date_start
+    #             Mission.mission_start > date_end  # Mission เริ่มหลังช่วง date_end
+    #         )
+    #     )
+    
+    unit_id_list = []
+    for unit in mission:
+        if unit.mission_id is None:
+            if unit.units_id not in unit_id_list:
+                unit_id_list.append(unit.units_id)
+        else:
+            if unit.mission_end < date_start or unit.mission_start > date_end :
+                if unit.units_id not in unit_id_list:
+                    unit_id_list.append(unit.units_id)
 
     unit = db.query(
             Unit.units_id,
