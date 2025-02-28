@@ -266,12 +266,9 @@ def get_units_active(db, position_id, first_name,last_name, date_start, date_end
             Position.position_name_short,
             Position.position_seq,
         ).filter(
-            or_(
-                and_(
-                Unit.status == 'ready',
+            and_(
+                Unit.units_id.in_(unit_id_list),
                 Unit.is_active == True
-                ),
-                Unit.units_id.in_(unit_id_list)
             )
         ).\
         join(Position, Position.position_id == Unit.position_id).order_by(desc(Position.position_seq))

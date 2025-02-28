@@ -218,7 +218,6 @@ class MissionService:
 
         # ดึง units ทั้งหมด
         all_units = db.query(Unit).filter(Unit.is_active == True).all()
-        print(unit_is_not_ready)
         # อัปเดตสถานะในหน่วยความจำ
         for unit in all_units:
             unit.status = "not ready" if unit.units_id in unit_is_not_ready else "ready"
