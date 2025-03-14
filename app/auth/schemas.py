@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
+from datetime import datetime
 
 class LoginRequest(BaseModel):
     username: str
@@ -24,3 +25,16 @@ class UserResponse(UserBase):
 
     class Config:
         orm_mode = True
+
+class UserB(BaseModel):
+    username: str
+    role: str
+    is_active: bool
+    created_at: datetime
+
+
+class UserResponseList(BaseModel):
+    user: list[UserB]
+    total: int
+    skip: int
+    limit: int

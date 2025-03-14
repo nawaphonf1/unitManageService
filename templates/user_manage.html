@@ -11,6 +11,21 @@
 </head>
 
 <body class="bg-light">
+    <style>
+        .status-dot {
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          margin-right: 5px;
+        }
+        .active {
+          background-color: green;
+        }
+        .inactive {
+          background-color: red;
+        }
+      </style>
 
     <div class="row">
         <!-- Sidebar -->
@@ -59,25 +74,21 @@
         <div class="col-md-11 p-4 ms-auto">
             <h5 class="text-center pb-4">จัดการผู้ใช้งาน</h5>
             <div class="d-flex justify-content-end mb-3">
-                <button type="button" id="addUnitBtn" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#unitAddModal">+ กำลังพล</button>
-                <button type="button" id="filter-units" class="btn btn-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#filterModal">ตัวกรอง</button>
-                <button type="button" id="export-excel" class="btn btn-warning text-white btn-sm ms-2" >Export Excel</button>
-                <button type="button" id="import-excel" class="btn btn-primary btn-sm ms-2" >Import Excel</button>
+                <button type="button" id="addUserModel" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModel">+ user</button>
+                <button type="button" id="filterUserModel" class="btn btn-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#filterUserModel">ตัวกรอง</button>
             </div>
 
             <table class="table table-bordered table-striped">
                 <thead class="table-primery text-center">
                     <tr>
                         <th>#</th>
-                        <th>รูป</th>
-                        <th>ยศ</th>
-                        <th>ชื่อ</th>
-                        <th>สังกัด</th>
-                        <th>สถานะปัจจุบัน</th>
-                        <th></th>
+                        <th>username</th>
+                        <th>role</th>
+                        <th>สถานะ</th>
+                        <th>สร้างเมื่อ</th>
                     </tr>
                 </thead>
-                <tbody id="unitTableBody" class="text-center text-align-center align-middle">
+                <tbody id="userTableBody" class="text-center text-align-center align-middle">
                     <!-- Rows will be dynamically inserted here -->
                 </tbody>
             </table>
@@ -90,7 +101,7 @@
 
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="static/js/unit.js"></script>
+        <script src="static/js/user_manage.js"></script>
 </body>
 
 </html>
