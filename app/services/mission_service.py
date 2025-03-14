@@ -81,6 +81,7 @@ class MissionService:
             Mission.mission_type
         ).filter(Mission.is_active == True)
         
+        
         if mission_name:
             query = query.filter(Mission.mission_name.contains(mission_name))
         if mission_start:
@@ -95,7 +96,7 @@ class MissionService:
         total = query.with_entities(func.count()).scalar()
 
         # Apply pagination
-        missions = query.offset(skip).limit(limit).all()
+        missions = query.order_by(desc(Mission.created_at)).offset(skip).limit(limit).all()
         
         return {
         "missions": [
@@ -236,7 +237,7 @@ class MissionService:
             elif mission.mission_start > current_date:
                 mission.mission_status = "w"
             else:
-                "nr"
+                mission.mission_status = "n"
         
         db.commit()
 

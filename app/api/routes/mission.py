@@ -49,6 +49,7 @@ def get_missions(
         db: Session = Depends(get_db), 
         current_user: User = Depends(get_current_user)):
     db_missions = MissionService.get_missions(db, skip, limit, mission_name, mission_start, mission_end, mission_type, mission_status)
+    MissionService.update_status_unit(db)
     return db_missions 
 
 #get mission by id

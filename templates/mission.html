@@ -21,14 +21,14 @@
                 <p>Mission Force 4002</p>
             </div>
             <ul class="nav flex-column">
-                <!--<li class="nav-item py-2 hover-sidebar">
+                <li class="nav-item py-2 hover-sidebar">
                     <a class="nav-link text-white" href="http://127.0.0.1:8000/index">
                         <img src="/static/img/dashboard.png" alt="Logo" class="rounded mx-auto d-block"
                             style="max-width: 40px;">
-                        สรุปยอด
+                        สรุป
                     </a>
                 </li>
-                -->
+               
                 <li class="nav-item py-2 hover-sidebar">
                     <a class="nav-link text-white" href="/mission">
                         <img src="/static/img/package.png" alt="Logo" class="rounded mx-auto d-block"
@@ -39,9 +39,18 @@
                 <li class="nav-item py-2 hover-sidebar">
 
                     <a class="nav-link text-white" href="/unit">
-                        <img src="/static/img/multiple-users-silhouette.png" alt="Logo" class="rounded mx-auto d-block"
+                        <img src="/static/img/soldier.png" alt="Logo" class="rounded mx-auto d-block"
                             style="max-width: 40px;">
                         จัดการกำลังพล
+                    </a>
+                </li>
+
+                <li class="nav-item py-2 hover-sidebar">
+
+                    <a class="nav-link text-white" href="/user_manage">
+                        <img src="/static/img/multiple-users-silhouette.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        จัดการผู้ใช้งาน
                     </a>
                 </li>
             </ul>
@@ -171,25 +180,25 @@
                                                 <input type="text" class="form-control" id="filterMissionName">
                                             </div>
                                             <div>
-                                                <label for="filterDateStart">วันที่เริ่มต้น</label>
-                                                <input type="date" class="form-control" id="filterDateStart">
+                                                <label for="filterDateStartM">วันที่เริ่มต้น</label>
+                                                <input type="date" class="form-control" id="filterDateStartM">
 
                                             </div>
                                             <div>
-                                                <label for="filterDateEnd">วันที่สิ้นสุด</label>
-                                                <input type="date" class="form-control" id="filterDateEnd">
+                                                <label for="filterDateEndM">วันที่สิ้นสุด</label>
+                                                <input type="date" class="form-control" id="filterDateEndM">
 
                                             </div>
 
                                             <div>
-                                                <label for="filterMissionType">ประเภทภารกิจ</label>
-                                                <input type="text" class="form-control" id="filterMissionType">
+                                                <label for="filterMissionTypeM">ประเภทภารกิจ</label>
+                                                <input type="text" class="form-control" id="filterMissionTypeM">
 
                                             </div>
                                             
                                             <div>
-                                                <label for="filterStatus">สถานะ</label>
-                                                <select class="form-select" id="filterStatus">
+                                                <label for="filterStatusM">สถานะ</label>
+                                                <select class="form-select" id="filterStatusM">
                                                     <option selected></option>
                                                     <option value="r">กำลังดำเนินการ</option>
                                                     <option value="w">รอดำเนินการ</option>
