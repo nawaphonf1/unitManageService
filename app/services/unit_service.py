@@ -251,6 +251,7 @@ def get_units_active(db, position_id, first_name,last_name, date_start, date_end
             Mission.mission_end,
             MissionUnit.unit_id.label("mission_unit_id"),
             Unit.units_id,
+            Mission.mission_status
         ).outerjoin(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
         outerjoin(Mission, Mission.mission_id == MissionUnit.mission_id).all()
     
@@ -263,14 +264,32 @@ def get_units_active(db, position_id, first_name,last_name, date_start, date_end
     #     )
     
     unit_id_list = []
+    unit_id_list_n =[]
+    unit_id_list_dont_use =[]
+
     for unit in mission:
         if unit.mission_id is None:
             if unit.units_id not in unit_id_list:
                 unit_id_list.append(unit.units_id)
         else:
-            if unit.mission_end < date_start or unit.mission_start > date_end :
-                if unit.units_id not in unit_id_list:
-                    unit_id_list.append(unit.units_id)
+            if unit.mission_status != "n":
+                if unit.mission_end < date_start or unit.mission_start > date_end :
+                    if unit.units_id not in unit_id_list:
+                        unit_id_list.append(unit.units_id)
+                else:
+                    if unit.units_id not in unit_id_list_dont_use:
+                        unit_id_list_dont_use.append(unit.units_id)
+            else:
+                unit_id_list_n.append({
+                    "units_id": unit.units_id,
+                    "mission_id": unit.mission_id,
+                    "mission_start": unit.mission_start,
+                    "mission_end": unit.mission_end,
+                })
+                
+    for list_n in unit_id_list_n:
+        if list_n["units_id"] not in unit_id_list and list_n["units_id"] not in unit_id_list_dont_use:
+            unit_id_list.append(list_n["units_id"])
 
     unit = db.query(
             Unit.units_id,
