@@ -27,6 +27,9 @@ const rowsPerPage = 10;
 // Function to fetch and display units
 async function fetchAndDisplayMission(page = 1, mission_name = "", mission_start= "", mission_end= "", mission_type= "", mission_status= "") {
     try {
+        console.log(mission_status);
+        console.log("fetchAndDisplayMission");
+        console.log(mission_name);
         // สร้าง query string เฉพาะพารามิเตอร์ที่มีค่า
         const queryParams = new URLSearchParams();
         queryParams.append("skip", (page - 1) * rowsPerPage);
@@ -146,11 +149,13 @@ function updatePagination(totalPages, currentPage) {
 
 document.getElementById("submit-filter-mission").addEventListener("click", () => {
     const mission_name = document.getElementById("filterMissionName").value;
-    const mission_start = document.getElementById("filterDateStart").value;
-    const mission_end = document.getElementById("filterDateEnd").value;
-    const mission_type = document.getElementById("filterMissionType").value;
-    const mission_status = document.getElementById("filterStatus").value;
+    const mission_start = document.getElementById("filterDateStartM").value;
+    const mission_end = document.getElementById("filterDateEndM").value;
+    const mission_type = document.getElementById("filterMissionTypeM").value;
+    const mission_status = document.getElementById("filterStatusM").value;
 
+    console.log(mission_status);
+    console.log(mission_name);
 
     fetchAndDisplayMission(1, mission_name, mission_start, mission_end, mission_type, mission_status);
 
@@ -306,7 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     
-
+    console.log("DOMContentLoaded");
     fetchAndDisplayMission(currentPage)
     window.showMissionDetail = showMissionDetail;
 });

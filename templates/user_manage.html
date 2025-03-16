@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="/static/css/index.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <style>
+        .status-dot {
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          margin-right: 5px;
+        }
+        .active {
+          background-color: green;
+        }
+        .inactive {
+          background-color: red;
+        }
+      </style>
+
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-1 bg-dark text-white vh-100 text-center h-100 position-fixed">
+            <div class="mb-3 mt-3">
+                <img src="/static/img/logo.png" alt="Logo" class="rounded mx-auto d-block" style="max-width: 70px;">
+                <p>Mission Force 4002</p>
+            </div>
+            <ul class="nav flex-column">
+                <li class="nav-item py-2 hover-sidebar">
+                    <a class="nav-link text-white" href="http://127.0.0.1:8000/index">
+                        <img src="/static/img/dashboard.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        สรุป
+                    </a>
+                </li>
+               
+                <li class="nav-item py-2 hover-sidebar">
+                    <a class="nav-link text-white" href="/mission">
+                        <img src="/static/img/package.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        จัดการภารกิจ
+                    </a>
+                </li>
+                <li class="nav-item py-2 hover-sidebar">
+
+                    <a class="nav-link text-white" href="/unit">
+                        <img src="/static/img/soldier.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        จัดการกำลังพล
+                    </a>
+                </li>
+
+                <li class="nav-item py-2 hover-sidebar">
+
+                    <a class="nav-link text-white" href="/user_manage">
+                        <img src="/static/img/multiple-users-silhouette.png" alt="Logo" class="rounded mx-auto d-block"
+                            style="max-width: 40px;">
+                        จัดการผู้ใช้งาน
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-11 p-4 ms-auto">
+            <h5 class="text-center pb-4">จัดการผู้ใช้งาน</h5>
+            <div class="d-flex justify-content-end mb-3">
+                <button type="button" id="addUserModel" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addUserModel">+ user</button>
+                <button type="button" id="filterUserModel" class="btn btn-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#filterUserModel">ตัวกรอง</button>
+            </div>
+
+            <table class="table table-bordered table-striped">
+                <thead class="table-primery text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>username</th>
+                        <th>role</th>
+                        <th>สถานะ</th>
+                        <th>สร้างเมื่อ</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody" class="text-center text-align-center align-middle">
+                    <!-- Rows will be dynamically inserted here -->
+                </tbody>
+            </table>
+
+            <nav>
+                <ul class="pagination justify-content-center" id="pagination">
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="static/js/user_manage.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="/static/css/index.css" rel="stylesheet">
+</head>
+
+<body class="bg-login h-100">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-4 align-items-center p-4 rounded-3 shadow bg-light">
+                <img src="/static/img/logo.png" class="img-fluid rounded-top mx-auto d-block" alt="" />
+                <p class="text-center fs-5">ลงทะเบียนระบบ - Mission Force 4002</p>
+
+                <form id="registerForm">
+                    <div id="alert" class="alert alert-danger mt-3 d-none" role="alert">
+                        รหัสผ่านไม่ตรงกันกรุณาลองใหม่อีกครั้ง
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const alertBox = document.getElementById("alert");
+
+            if (password !== confirmPassword) {
+                alertBox.textContent = "Passwords do not match.";
+                alertBox.classList.remove("d-none");
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Registration failed");
+                }
+
+                const data = await response.json();
+                alert("ลงทะเบียนสำเร็จ กรุณารอการอนุมัติจากผู้ดูแลระบบ");
+                window.location.href = "/";  // เปลี่ยนเส้นทางไปหน้า Login
+            } catch (error) {
+                alertBox.textContent = error.message;
+                alertBox.classList.remove("d-none");
+            }
+        });
+
+    </script>
+</body>
+
+<script src="static/js/login.js"></script>
+
+</html>

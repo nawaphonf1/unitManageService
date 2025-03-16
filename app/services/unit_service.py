@@ -117,6 +117,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
         )
         .outerjoin(Position, Unit.position_id == Position.position_id)
         .outerjoin(Dept, Unit.dept_id == Dept.dept_id)
+        .filter(Unit.is_active == True)
     )
 
     # Apply filters
