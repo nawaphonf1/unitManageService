@@ -1,21 +1,27 @@
 function getCookie(name) {
-    let cookieArr = document.cookie.split(";");
-    for (let i = 0; i < cookieArr.length; i++) {
-        let cookie = cookieArr[i].trim();
-        if (cookie.startsWith(name + "=")) {
-            return cookie.substring(name.length + 1);
+    let cookies = document.cookie.split("; ");
+    for (let cookie of cookies) {
+        let [key, value] = cookie.split("=");
+        if (key === name) {
+            return decodeURIComponent(value); // ถอดรหัสค่าเผื่อมีอักขระพิเศษ
         }
     }
     return null;
 }
 
-// Use this function to retrieve the token
+// เรียกใช้ฟังก์ชัน
 let token = getCookie("access_token");
+let role = getCookie("role");
+
+console.log("Token:", token);
+console.log("Role:", role);
+
 
 // Redirect to home if no token
 if (!token) {
-    // window.location.href = "/"; // Replace '/' with your homepage URL if different
+    window.location.href = "/"; // Replace '/' with your homepage URL if different
 }
+// API
 
 // API endpoint URL
 const apiUrl = "/api/summary/";
@@ -116,5 +122,16 @@ function displayChart(data) {
     });
 }
 
-// 🔹 โหลดข้อมูลจาก API เมื่อหน้าเว็บโหลดเสร็จ
-document.addEventListener("DOMContentLoaded", fetchAndDisplaySummary());
+
+document.addEventListener("DOMContentLoaded", function () {
+    if (role !== "admin") {
+        const user_manage = document.getElementById("user_manage");
+        if (user_manage) {
+            user_manage.remove();  // ลบปุ่มออกจาก DOM
+        }
+    
+    }
+
+    fetchAndDisplaySummary();
+});
+

@@ -28,4 +28,4 @@ def login_user(
     
     # สร้าง token และส่งกลับ
     access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "role": user.role}

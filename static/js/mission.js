@@ -1,16 +1,21 @@
 function getCookie(name) {
-    let cookieArr = document.cookie.split(";");
-    for (let i = 0; i < cookieArr.length; i++) {
-        let cookie = cookieArr[i].trim();
-        if (cookie.startsWith(name + "=")) {
-            return cookie.substring(name.length + 1);
+    let cookies = document.cookie.split("; ");
+    for (let cookie of cookies) {
+        let [key, value] = cookie.split("=");
+        if (key === name) {
+            return decodeURIComponent(value); // ถอดรหัสค่าเผื่อมีอักขระพิเศษ
         }
     }
     return null;
 }
 
-// Use this function to retrieve the token
+// เรียกใช้ฟังก์ชัน
 let token = getCookie("access_token");
+let role = getCookie("role");
+
+console.log("Token:", token);
+console.log("Role:", role);
+
 
 // Redirect to home if no token
 if (!token) {
@@ -103,10 +108,8 @@ async function fetchAndDisplayMission(page = 1, mission_name = "", mission_start
                 </td>
                 <td>
                     <button class="btn btn-info btn-sm" data-id="${mission.mission_id}" onclick="showMissionDetail(${mission.mission_id})">รายละเอียด</button>
-                    <button class="btn btn-warning btn-sm" data-id="${mission.mission_id}" onclick="showMissionEdit(${mission.mission_id})">แก้ไข</button>
-                    <button class="btn btn-danger btn-sm" data-id="${mission.mission_id}" onclick="delMission(${mission.mission_id})">ลบ</button>
-
-
+                    ${role === "admin" ? `<button class="btn btn-warning btn-sm" data-id="${mission.mission_id}" onclick="showMissionEdit(${mission.mission_id})">แก้ไข</button>` : ""}
+                    ${role === "admin" ? `<button class="btn btn-danger btn-sm" data-id="${mission.mission_id}" onclick="delMission(${mission.mission_id})">ลบ</button>` : ""}                    
                 </td>
             `;
             tableBody.appendChild(row);
@@ -304,6 +307,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    if (role !== "admin") {
+        const addMissionBtn = document.getElementById("addMissionBtn");
+        if (addMissionBtn) {
+            addMissionBtn.remove();  // ลบปุ่มออกจาก DOM
+        }
+
+        const user_manage = document.getElementById("user_manage");
+        if (user_manage) {
+            user_manage.remove();  // ลบปุ่มออกจาก DOM
+        }
+
+    }
+    
     
     console.log("DOMContentLoaded");
     fetchAndDisplayMission(currentPage)

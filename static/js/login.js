@@ -19,7 +19,9 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
     .then(data => {
         if (data.access_token) {
             // เก็บ token ใน cookie
-            document.cookie = `access_token=${data.access_token}; path=/; max-age=360000`;// กำหนดให้ cookie หมดอายุใน 1 ชั่วโมง
+            document.cookie = `role=${data.role}; path=/; max-age=3600000; Secure; SameSite=Lax`;
+            document.cookie = `access_token=${data.access_token}; path=/; max-age=3600000; Secure; SameSite=Lax`;
+
             window.location.href = '/mission';  // ถ้าผ่านให้ไปหน้า index.html
         } else {
             document.getElementById("alert").classList.remove("d-none");

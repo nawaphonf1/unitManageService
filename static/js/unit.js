@@ -1,22 +1,26 @@
 function getCookie(name) {
-    let cookieArr = document.cookie.split(";");
-    for (let i = 0; i < cookieArr.length; i++) {
-        let cookie = cookieArr[i].trim();
-        if (cookie.startsWith(name + "=")) {
-            return cookie.substring(name.length + 1);
+    let cookies = document.cookie.split("; ");
+    for (let cookie of cookies) {
+        let [key, value] = cookie.split("=");
+        if (key === name) {
+            return decodeURIComponent(value); // ถอดรหัสค่าเผื่อมีอักขระพิเศษ
         }
     }
     return null;
 }
 
-// Use this function to retrieve the token
+// เรียกใช้ฟังก์ชัน
 let token = getCookie("access_token");
+let role = getCookie("role");
+
+console.log("Token:", token);
+console.log("Role:", role);
+
 
 // Redirect to home if no token
 if (!token) {
     window.location.href = "/"; // Replace '/' with your homepage URL if different
 }
-
 // API endpoint URL
 const apiUrl = "/api/unit/";
 
@@ -107,8 +111,8 @@ async function fetchAndDisplayUnits(page = 1, position = '', dept = '', status =
                 </td>
                 <td>
                     <button class="btn btn-info btn-sm" data-id="${unit.units_id}" onclick="showMemberDetail(${unit.units_id})">รายละเอียด</button>
-                    <button class="btn btn-warning btn-sm" data-id="${unit.units_id}" onclick="showMemberEdit(${unit.units_id})">แก้ไข</button>
-                    <button class="btn btn-danger btn-sm" data-id="${unit.units_id}" onclick="delMember(${unit.units_id})">ลบ</button>
+                    ${role === "admin" ? `  <button class="btn btn-warning btn-sm" data-id="${unit.units_id}" onclick="showMemberEdit(${unit.units_id})">แก้ไข</button>` : ""}
+                    ${role === "admin" ? `  <button class="btn btn-danger btn-sm" data-id="${unit.units_id}" onclick="delMember(${unit.units_id})">ลบ</button>` : ""}                    
                 </td>
             `;
             tableBody.appendChild(row);
@@ -414,6 +418,24 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (error) {
             console.error("Error fetching member details:", error);
             alert("เกิดข้อผิดพลาดในการลบสมาชิก");
+        }
+
+    }
+
+    if (role !== "admin") {
+        const addUnitBtn = document.getElementById("addUnitBtn");
+        if (addUnitBtn) {
+            addUnitBtn.remove();  // ลบปุ่มออกจาก DOM
+        }
+
+        const importExcel = document.getElementById("import-excel");
+        if(importExcel){
+            importExcel.remove();
+        }
+        
+        const user_manage = document.getElementById("user_manage");
+        if (user_manage) {
+            user_manage.remove();  // ลบปุ่มออกจาก DOM
         }
 
     }
