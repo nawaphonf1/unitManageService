@@ -9,7 +9,7 @@ class LoginRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
-    role: str
+    role: Optional[str] = None
 
 class TokenData(BaseModel):
     username: str | None = None
@@ -28,6 +28,7 @@ class UserResponse(UserBase):
         orm_mode = True
 
 class UserB(BaseModel):
+    user_id: int
     username: str
     role: str
     is_active: bool
@@ -39,3 +40,9 @@ class UserResponseList(BaseModel):
     total: int
     skip: int
     limit: int
+
+class UserUpdate(BaseModel):
+    username: str
+    password: Optional[str] = None
+    role: str
+    is_active: bool
