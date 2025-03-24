@@ -5,6 +5,7 @@ from app.api.routes import position
 from app.api.routes import dept
 from app.api.routes import summary
 from app.api.routes import user
+from app.api.routes import usage_logs
 
 api_router = APIRouter()
 
@@ -14,6 +15,7 @@ api_router.include_router(position.router, prefix="/position", tags=["position"]
 api_router.include_router(dept.router, prefix="/dept", tags=["dept"])
 api_router.include_router(summary.router, prefix="/summary", tags=["summary"])
 api_router.include_router(user.router, prefix="/user", tags=["user"])
+api_router.include_router(usage_logs.router, prefix="/usage_logs", tags=["usage_logs"])
 
 
 

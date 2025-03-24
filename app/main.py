@@ -5,6 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import api_router
 from app.auth import auth_api_router
+from app.middleware import LoggingMiddleware
+
 
 app = FastAPI()
 
@@ -55,3 +57,4 @@ def unit_page(request: Request):
 def unit_page(request: Request):
     return templates.TemplateResponse("user_manage.html", {"request": request})
 
+app.add_middleware(LoggingMiddleware)

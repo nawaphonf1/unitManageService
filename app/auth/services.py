@@ -37,7 +37,6 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_user_by_username(db: Session, username: str):
-    print(username)
     return db.query(User).filter(User.username == username).first()
 
 # Secret Key และ Algorithm 
@@ -67,7 +66,7 @@ def decode_access_token(token: str):
     except JWTError:
         return None
     
-def verify_token(token: str, db: Session = Depends(get_db)):
+def verify_token(token: str, db: Session):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
@@ -90,5 +89,5 @@ def verify_token(token: str, db: Session = Depends(get_db)):
         )
 
 # ฟังก์ชันที่ใช้ใน route เพื่อตรวจสอบการยืนยันตัวตน
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user(db: Session, token: str = Depends(oauth2_scheme)):
     return verify_token(token, db)
