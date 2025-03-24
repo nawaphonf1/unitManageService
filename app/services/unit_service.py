@@ -216,6 +216,7 @@ def get_all_units(db: Session, name=None, position_id=None, dept_id=None,status=
             Mission.mission_end,
         ).join(Mission, Mission.mission_id == MissionUnit.mission_id)\
         .filter(MissionUnit.unit_id == unit.units_id)\
+        .filter(Mission.is_active == True)\
         .order_by(desc(Mission.mission_start))\
         .first()
 
@@ -277,7 +278,9 @@ def get_units_active(db, position_id, first_name,last_name, date_start, date_end
             Unit.units_id,
             Mission.mission_status
         ).outerjoin(MissionUnit, MissionUnit.unit_id == Unit.units_id).\
-        outerjoin(Mission, Mission.mission_id == MissionUnit.mission_id).all()
+        outerjoin(Mission, Mission.mission_id == MissionUnit.mission_id).\
+        filter(Mission.is_active == True).\
+        all()
     
     # .\
     #     filter(
