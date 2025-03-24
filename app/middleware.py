@@ -8,34 +8,44 @@ from app.database import SessionLocal
 from app.config import SECRET_KEY, ALGORITHM
 
 from app.auth.services import get_current_user
-
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         db: Session = SessionLocal()
+
+        # อ่าน body มาก่อน เพราะหลังจาก call_next จะอ่านไม่ได้
+        body_bytes = await request.body()
+        print("Body payload:", body_bytes.decode("utf-8"))
+
+        # จำเป็นต้องสร้าง request ใหม่ เพราะ body ถูกอ่านไปแล้ว
+        request = Request(request.scope, receive=lambda: {"type": "http.request", "body": body_bytes})
+
         response = await call_next(request)
 
         # ดึง Token จาก Header
         auth_header = request.headers.get("Authorization")
-        username = "anonymous"  # ค่า default ถ้าไม่มี token
-
-
+        username = "anonymous"
 
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header.split(" ")[1]
-
             try:
                 geruser = get_current_user(db, token)
-                username = geruser.username  # ดึง username จาก payload
+                username = geruser.username
             except JWTError:
-                pass  # ถ้า token ไม่ถูกต้องจะใช้ "anonymous"
+                pass
 
-        if request.url.path != "/docs" or request.url.path != "/openapi.json" or request.url.path.like("/static"):
-
-            # บันทึก Log ลงฐานข้อมูล
+        # ไม่บันทึก log สำหรับ paths เหล่านี้
+        if not (
+            request.url.path.startswith("/docs")
+            or request.url.path.startswith("/openapi.json")
+            or request.url.path.startswith("/static")
+        ):
             log_entry = UsageLog(
                 username=username,
                 action=f"{request.method} {request.url.path}",
-                details={"query_params": dict(request.query_params)},
+                details={
+                    "query_params": dict(request.query_params),
+                    "body": body_bytes.decode("utf-8")
+                },
                 ip_address=request.client.host,
                 user_agent=request.headers.get("User-Agent"),
             )
@@ -44,4 +54,4 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             db.commit()
             db.close()
 
-            return response
+        return response

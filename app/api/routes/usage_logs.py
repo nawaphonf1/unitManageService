@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
+
 from app.database import get_db
 
 from app.schemas.usage_logs import UsageLogCreate, UsageLogResponse
@@ -24,4 +26,13 @@ def create_usage_log(log: UsageLogCreate, db: Session = Depends(get_db), request
 
 @router.get("/", response_model=list[UsageLogResponse])
 def get_usage_logs(db: Session = Depends(get_db)):
-    return db.query(UsageLog).all()
+    return db.query(UsageLog).order_by(desc(UsageLog.timestamp)).all()
+
+#get log by username have pagination
+@router.get("/username/{username}", response_model=list[UsageLogResponse])
+def get_usage_logs_by_username(
+        username: str, 
+        skip: int = 0,
+        limit: int = 100, 
+        db: Session = Depends(get_db)):
+    return db.query(UsageLog).filter(UsageLog.username == username).order_by(desc(UsageLog.timestamp)).offset(skip).limit(limit).all()

@@ -80,8 +80,10 @@ async function fetchAndDisplayUser(page = 1, username = '', role = '', is_active
                 <td>${formatDateToThai(user.created_at)}</td>
                 <td>
                     <button class="btn btn-warning btn-sm" data-id="${user.user_id}" onclick="showUserEdit(${user.user_id})">แก้ไข</button>
+                    <button class="btn btn-primary btn-sm" onclick="showUserLog(1, '${encodeURIComponent(user.username)}')">การใช้งาน</button>
                 </td>
             `;
+
             tableBody.appendChild(row);
         });
 
@@ -90,6 +92,63 @@ async function fetchAndDisplayUser(page = 1, username = '', role = '', is_active
         updatePagination(totalPages, page);
     } catch (error) {
         console.error("Error fetching units:", error);
+    }
+}
+
+async function showUserLog(page = 1, userName) {
+    try {
+        const queryParams = new URLSearchParams();
+        queryParams.append("skip", (page - 1) * rowsPerPage);
+        queryParams.append("limit", rowsPerPage);
+
+        const response = await fetch(`api/usage_logs/username/${userName}?${queryParams.toString()}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // Attach the token in the Authorization header
+            }
+        });
+
+        if (response.status === 401) {
+            alert("Session expired. Redirecting to the homepage.");
+            window.location.href = "/"; // Replace '/' with your homepage URL
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch user details.");
+        }
+
+        const data = await response.json();
+        const tableBody = document.getElementById("logTableBody");
+        const pagination = document.getElementById("pagination");
+
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        data.forEach((user, index) => {
+            const row = document.createElement("tr");
+            const detailsText = typeof user.details === 'object'
+                ? JSON.stringify(user.details, null, 2)
+                : user.details;
+
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${user.action}</td>
+                <td><pre>${detailsText}</pre></td>
+                <td>${formatDateToThai(user.timestamp)}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+
+
+        // เปิด modal
+        const LogModel = new bootstrap.Modal(document.getElementById("LogModel"));
+        LogModel.show();
+
+    } catch (error) {
+        console.error("Error fetching user details:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้");
     }
 }
 
@@ -134,12 +193,12 @@ async function showUserEdit(userId) {
     }
 }
 
-document.getElementById("userStatusEdit").addEventListener("change", function() {
+document.getElementById("userStatusEdit").addEventListener("change", function () {
     const newStatus = this.checked; // true = Active, false = Inactive
     console.log("User Status Changed:", newStatus);
 });
 
-document.getElementById("confirmEdit").addEventListener("click", function() {
+document.getElementById("confirmEdit").addEventListener("click", function () {
     username = document.getElementById('userEditName').value;
     role = document.getElementById('userRoleEdit').value;
     is_active = document.getElementById('userStatusEdit').checked;
@@ -151,7 +210,7 @@ document.getElementById("confirmEdit").addEventListener("click", function() {
     console.log("Status:", is_active);
     console.log("Password:", password);
 
-   const data = {
+    const data = {
         username: username,
         role: role,
         is_active: is_active,

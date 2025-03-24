@@ -87,6 +87,7 @@
                         <th>สถานะ</th>
                         <th>สร้างเมื่อ</th>
                         <th></th>
+
                     </tr>
                 </thead>
                 <tbody id="userTableBody" class="text-center text-align-center align-middle">
@@ -98,6 +99,36 @@
                 <ul class="pagination justify-content-center" id="pagination">
                 </ul>
             </nav>
+        </div>
+
+        <!-- Log history -->
+        <div class="modal fade" id="LogModel" tabindex="-1" aria-labelledby="LogModelLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="LogModelLabel">รายละเอียดผู้ใช้งาน</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ลำดับ</th>
+                                    <th scope="col">กระทำ</th>
+                                    <th scope="col">รายละเอียด</th>
+                                    <th scope="col">เวลา</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logTableBody">
+                                <!-- Rows will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
         </div>
         
         <!-- edit -->
